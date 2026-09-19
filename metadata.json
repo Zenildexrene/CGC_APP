@@ -1,0 +1,7 @@
+{
+  "name": "Prucon Gaming",
+  "description": "The official Congolese Gaming Network platform with tournaments, clans, gamer cards, community announcements, and XP progression.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

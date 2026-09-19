@@ -112,7 +112,7 @@ fun PruconHeader(
           )
           Spacer(modifier = Modifier.width(6.dp))
           Text(
-            text = "PRUCON CORE ACTIVE",
+            text = "CGC RÉSEAU ACTIF",
             color = EmeraldGlow,
             fontSize = 9.sp,
             fontWeight = FontWeight.Bold,
@@ -203,7 +203,7 @@ fun PruconHeader(
           ) {
             Icon(
               imageVector = if (profile.isCreator) Icons.Default.Shield else Icons.Default.SportsEsports,
-              contentDescription = "PRUCON Logo",
+              contentDescription = "CGC Logo",
               tint = CyberBlack,
               modifier = Modifier.size(22.dp)
             )
@@ -213,18 +213,18 @@ fun PruconHeader(
 
           Column {
             Text(
-              text = "PRUCON GAMING",
+              text = "CGC",
               color = TextPrimary,
-              fontSize = 18.sp,
+              fontSize = 20.sp,
               fontWeight = FontWeight.Black,
-              letterSpacing = 1.5.sp
+              letterSpacing = 2.sp
             )
             Text(
-              text = if (profile.isCreator) "PROJET CRÉÉ PAR ZENIL DELUTU" else "CONGOLESE GAMING NETWORK",
-              color = if (profile.isCreator) GoldNeon else TextSecondary,
+              text = "COMMUNAUTÉ GAMING CONGOLAISE",
+              color = EmeraldGlow,
               fontSize = 8.5.sp,
-              fontWeight = FontWeight.SemiBold,
-              letterSpacing = 1.sp
+              fontWeight = FontWeight.Bold,
+              letterSpacing = 0.8.sp
             )
           }
         }
@@ -322,7 +322,7 @@ fun PruconHeader(
             text = if (profile.isCreator) {
               "Console Suprême Active • Propriétaire: ${PruconRepository.CREATOR_EMAIL} • Statut Protégé"
             } else {
-              "PRUCON Core v2.4.0 Online • Congolese Gaming Network • Gamer Card Sync: OK"
+              "CGC Core v2.4.0 Online • Communauté Gaming Congolaise • Gamer Card Sync: OK"
             },
             color = if (profile.isCreator) GoldNeon else TextMuted,
             fontSize = 9.sp,

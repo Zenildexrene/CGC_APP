@@ -302,7 +302,7 @@ fun TournamentsScreen(
                 fontSize = 12.sp
               )
               Text(
-                text = "Bonus d'inscription: +50 PRUCON XP accordés !",
+                text = "Bonus d'inscription: +50 CGC XP accordés !",
                 color = EmeraldGlow,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold
@@ -338,7 +338,7 @@ fun TournamentsScreen(
           )
           Spacer(modifier = Modifier.width(8.dp))
           Text(
-            text = "Règles & Fair-play PRUCON",
+            text = "Règles & Fair-play CGC",
             color = TextPrimary,
             fontWeight = FontWeight.Black,
             fontSize = 16.sp

@@ -1,6 +1,6 @@
 {
-  "name": "Prucon Gaming",
-  "description": "The official Congolese Gaming Network platform with tournaments, clans, gamer cards, community announcements, and XP progression.",
+  "name": "CGC",
+  "description": "CGC - Communauté Gaming Congolaise : tournois, clans, gamer cards, annonces et progression esport en RDC.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

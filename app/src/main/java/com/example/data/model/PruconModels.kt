@@ -10,7 +10,7 @@ enum class UserRole(val label: String, val levelPriority: Int) {
   CREATOR("Propriétaire & Créateur", 100),
   ADMIN("Administrateur", 80),
   MODERATOR("Modérateur", 60),
-  STAFF("Staff PRUCON", 40),
+  STAFF("Staff CGC", 40),
   PLAYER("Joueur", 10)
 }
 
@@ -50,7 +50,7 @@ data class Announcement(
   val authorTitle: String,
   val title: String,
   val content: String,
-  val tag: String, // "Tournoi", "Event", "Update", "Recrutement", "PRUCON"
+  val tag: String, // "Tournoi", "Event", "Update", "Recrutement", "CGC"
   val timestamp: String,
   val fireCount: Int = 0,
   val gamepadCount: Int = 0,

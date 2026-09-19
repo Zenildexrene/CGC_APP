@@ -77,7 +77,7 @@ fun LeaderboardScreen(
       ) {
         Column {
           Text(
-            text = "CLASSEMENT PRUCON",
+            text = "CLASSEMENT CGC",
             color = TextPrimary,
             fontSize = 20.sp,
             fontWeight = FontWeight.Black,

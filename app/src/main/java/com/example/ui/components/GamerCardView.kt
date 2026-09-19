@@ -98,7 +98,7 @@ fun GamerCardView(
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-              text = "PRUCON GAMER CARD",
+              text = "CARTE GAMER CGC",
               color = EmeraldGlow,
               fontSize = 11.sp,
               fontWeight = FontWeight.Black,
@@ -268,7 +268,7 @@ fun GamerCardView(
           ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
               Text(
-                text = "EXPÉRIENCE PRUCON",
+                text = "EXPÉRIENCE CGC",
                 color = TextSecondary,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
@@ -357,7 +357,7 @@ fun GamerCardView(
 
         // Card footer: Member since
         Text(
-          text = "Membre du PRUCON depuis ${profile.memberSince}",
+          text = "Membre de la CGC depuis ${profile.memberSince}",
           color = TextMuted,
           fontSize = 9.5.sp,
           fontWeight = FontWeight.Medium

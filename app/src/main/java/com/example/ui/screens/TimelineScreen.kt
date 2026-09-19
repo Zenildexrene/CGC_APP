@@ -83,7 +83,7 @@ fun TimelineScreen(
   var searchQuery by remember { mutableStateOf("") }
   var showAddDialog by remember { mutableStateOf(false) }
 
-  val filterTags = listOf("Tout", "Tournoi", "Event", "Update", "Recrutement", "PRUCON")
+  val filterTags = listOf("Tout", "Tournoi", "Event", "Update", "Recrutement", "CGC")
 
   val filteredList = announcements.filter { ann ->
     val matchesTag = selectedTag == "Tout" || ann.tag.equals(selectedTag, ignoreCase = true)
@@ -131,7 +131,7 @@ fun TimelineScreen(
         ) {
           Column {
             Text(
-              text = "PRUCON TIMELINE",
+              text = "CGC TIMELINE",
               color = TextPrimary,
               fontSize = 20.sp,
               fontWeight = FontWeight.Black,
@@ -505,7 +505,7 @@ private fun getTagColor(tag: String): Color {
     "event" -> PinkNeon
     "update" -> CyanNeon
     "recrutement" -> PurpleNeon
-    "prucon" -> EmeraldNeon
+    "cgc", "prucon" -> EmeraldNeon
     else -> TextSecondary
   }
 }
@@ -518,13 +518,13 @@ private fun NewAnnouncementDialog(
   var title by remember { mutableStateOf("") }
   var content by remember { mutableStateOf("") }
   var selectedTag by remember { mutableStateOf("Tournoi") }
-  val tags = listOf("Tournoi", "Event", "Update", "Recrutement", "PRUCON")
+  val tags = listOf("Tournoi", "Event", "Update", "Recrutement", "CGC")
 
   AlertDialog(
     onDismissRequest = onDismiss,
     title = {
       Text(
-        text = "Publier une Annonce PRUCON",
+        text = "Publier une Annonce CGC",
         color = TextPrimary,
         fontWeight = FontWeight.Black,
         fontSize = 18.sp

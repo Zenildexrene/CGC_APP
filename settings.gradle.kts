@@ -22,6 +22,6 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "Prucon Gaming"
+rootProject.name = "CGC"
 
 include(":app")

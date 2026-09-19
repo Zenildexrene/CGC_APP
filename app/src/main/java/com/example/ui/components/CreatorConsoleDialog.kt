@@ -562,7 +562,7 @@ private fun UserManagementRow(
                 }
               )
               DropdownMenuItem(
-                text = { Text("📋 Staff PRUCON", color = TextPrimary, fontSize = 11.sp) },
+                text = { Text("📋 Staff CGC", color = TextPrimary, fontSize = 11.sp) },
                 onClick = {
                   onNominate(UserRole.STAFF)
                   showRoleMenu = false
@@ -901,7 +901,7 @@ private fun CreateTournamentModal(
   var fee by remember { mutableStateOf("Gratuit") }
   var date by remember { mutableStateOf("Samedi à 15:00") }
   var slotsText by remember { mutableStateOf("32") }
-  var desc by remember { mutableStateOf("Tournoi officiel Prucon Gaming.") }
+  var desc by remember { mutableStateOf("Tournoi officiel CGC.") }
   var ruleText by remember { mutableStateOf("Fair-play strict, pas de triche, capture d'écran du score.") }
 
   AlertDialog(
@@ -996,7 +996,7 @@ private fun CreateAnnouncementModal(
 ) {
   var title by remember { mutableStateOf("") }
   var content by remember { mutableStateOf("") }
-  var tag by remember { mutableStateOf("PRUCON") }
+  var tag by remember { mutableStateOf("CGC") }
   var isPinned by remember { mutableStateOf(true) }
 
   AlertDialog(
@@ -1020,7 +1020,7 @@ private fun CreateAnnouncementModal(
         OutlinedTextField(
           value = tag,
           onValueChange = { tag = it },
-          label = { Text("Tag (PRUCON, Tournoi, Event, Update)") },
+          label = { Text("Tag (CGC, Tournoi, Event, Update)") },
           modifier = Modifier.fillMaxWidth()
         )
       }

@@ -34,7 +34,7 @@ class PruconRepository {
     tokens = 500,
     title = "Créateur & Propriétaire Suprême",
     memberSince = "Septembre 2026",
-    clan = "PRUCON Core Authority",
+    clan = "CGC Core Authority",
     tournamentsWon = 0,
     matchesPlayed = 0,
     winRate = "100%",
@@ -57,9 +57,9 @@ class PruconRepository {
         authorName = "Zenil",
         authorLevel = 50,
         authorTitle = "Créateur & Propriétaire",
-        title = "Bienvenue sur Prucon Gaming RDC - Lancement Officiel",
+        title = "Bienvenue sur la CGC - Communauté Gaming Congolaise",
         content = "L'application est officiellement déployée en direct. Le réseau est vierge et prêt à accueillir les gamers congolais. Tournois esport, salons de discussion et classements sont opérationnels !",
-        tag = "PRUCON",
+        tag = "CGC",
         timestamp = "À l'instant",
         fireCount = 1,
         gamepadCount = 0,
@@ -84,7 +84,7 @@ class PruconRepository {
         slotsFilled = 0,
         maxSlots = 32,
         status = TournamentStatus.OPEN,
-        description = "Tournoi d'inauguration créé par la direction Prucon Gaming.",
+        description = "Tournoi d'inauguration créé par la direction CGC.",
         rules = listOf(
           "Matchs en mode Compétitif standard",
           "Fair-play strict et capture du score final obligatoire"
@@ -99,7 +99,7 @@ class PruconRepository {
     listOf(
       GamingGroup(
         id = "grp_1",
-        name = "Lobby Officiel PRUCON",
+        name = "Lobby Officiel CGC",
         gameCategory = "Hub Communautaire",
         description = "Salon officiel central créé par le propriétaire du site (zenildelutu@gmail.com).",
         memberCount = 1,
@@ -121,7 +121,7 @@ class PruconRepository {
           senderId = "usr_zenil_creator",
           senderName = "Zenil",
           senderLevel = 50,
-          content = "Bienvenue à tous sur Prucon Gaming !",
+          content = "Bienvenue à tous sur la Communauté Gaming Congolaise (CGC) !",
           timestamp = "Maintenant",
           isMe = true
         )
@@ -193,7 +193,7 @@ class PruconRepository {
       xp = 100,
       nextLevelXp = 500,
       tokens = 20,
-      title = "Recrue PRUCON",
+      title = "Recrue CGC",
       memberSince = "Septembre 2026",
       clan = "Indépendant",
       tournamentsWon = 0,
@@ -241,8 +241,8 @@ class PruconRepository {
             title = when (newRole) {
               UserRole.ADMIN -> "Administrateur Officiel"
               UserRole.MODERATOR -> "Modérateur Communauté"
-              UserRole.STAFF -> "Staff Technique PRUCON"
-              UserRole.PLAYER -> "Joueur PRUCON"
+              UserRole.STAFF -> "Staff Technique CGC"
+              UserRole.PLAYER -> "Joueur CGC"
               UserRole.CREATOR -> u.title
             }
           )

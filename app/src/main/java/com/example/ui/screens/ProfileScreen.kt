@@ -114,7 +114,7 @@ fun ProfileScreen(
       ) {
         Column {
           Text(
-            text = "CARTE GAMER PRUCON",
+            text = "CARTE GAMER CGC",
             color = TextPrimary,
             fontSize = 20.sp,
             fontWeight = FontWeight.Black,
@@ -514,7 +514,7 @@ fun ProfileScreen(
             )
             Spacer(modifier = Modifier.width(6.dp))
             Text(
-              text = "SÉCURITÉ & RÉSEAU PRUCON",
+              text = "SÉCURITÉ & RÉSEAU CGC",
               color = EmeraldNeon,
               fontSize = 11.sp,
               fontWeight = FontWeight.Bold,

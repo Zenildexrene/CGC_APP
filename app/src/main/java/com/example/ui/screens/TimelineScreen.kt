@@ -81,9 +81,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.data.model.Announcement
+import com.example.data.model.LeaderboardGamer
 import com.example.data.model.LiveStream
 import com.example.data.model.UserRole
 import com.example.data.model.UserStory
+import com.example.ui.components.TopPlayersLeaderboardCard
 import com.example.ui.theme.CyberBlack
 import com.example.ui.theme.CyberCard
 import com.example.ui.theme.CyberCardBorder
@@ -107,6 +109,7 @@ fun TimelineScreen(
   announcements: List<Announcement>,
   stories: List<UserStory> = emptyList(),
   liveStreams: List<LiveStream> = emptyList(),
+  leaderboard: List<LeaderboardGamer> = emptyList(),
   currentUserName: String = "Zenil",
   currentUserRole: UserRole = UserRole.CREATOR,
   onAddAnnouncement: (title: String, content: String, tag: String) -> Unit,
@@ -115,6 +118,7 @@ fun TimelineScreen(
   onSharePost: (announcementId: String) -> Unit = {},
   onCreateStory: (title: String, tag: String) -> Unit = { _, _ -> },
   onAddLiveStream: (title: String, platform: String, streamUrl: String, gameName: String) -> Unit = { _, _, _, _ -> },
+  onViewFullLeaderboard: () -> Unit = {},
   modifier: Modifier = Modifier
 ) {
   var selectedTag by remember { mutableStateOf("Tout") }
@@ -177,7 +181,19 @@ fun TimelineScreen(
         )
       }
 
-      // 4. Search & Tag Filters
+      // 4. Simple Leaderboard UI Component (Top Players in CGC Community)
+      if (leaderboard.isNotEmpty()) {
+        item {
+          Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+            TopPlayersLeaderboardCard(
+              topGamers = leaderboard,
+              onViewFullLeaderboard = onViewFullLeaderboard
+            )
+          }
+        }
+      }
+
+      // 5. Search & Tag Filters
       item {
         Column(
           modifier = Modifier

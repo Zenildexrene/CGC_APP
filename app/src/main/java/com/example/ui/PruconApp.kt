@@ -160,6 +160,7 @@ fun PruconApp(
             announcements = announcements,
             stories = stories,
             liveStreams = liveStreams,
+            leaderboard = leaderboard,
             currentUserName = profile.secretName,
             currentUserRole = profile.role,
             onAddAnnouncement = { title, content, tag ->
@@ -179,6 +180,9 @@ fun PruconApp(
             },
             onAddLiveStream = { title, platform, streamUrl, gameName ->
               repository.addLiveStream(title, platform, streamUrl, gameName)
+            },
+            onViewFullLeaderboard = {
+              selectedTab = PruconTab.LEADERBOARD
             }
           )
         }

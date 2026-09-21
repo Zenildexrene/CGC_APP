@@ -81,6 +81,7 @@ fun PruconApp(
   var showCreatorConsole by remember { mutableStateOf(false) }
   var showAdminDashboard by remember { mutableStateOf(false) }
   var showSafetyDashboard by remember { mutableStateOf(false) }
+  var showNotificationsDialog by remember { mutableStateOf(false) }
   var showAuthDialog by remember { mutableStateOf(false) }
   var showMenuDialog by remember { mutableStateOf(false) }
 
@@ -116,6 +117,9 @@ fun PruconApp(
   val emergencyShield by repository.emergencyShield.collectAsState()
   val twoFactorEnabled by repository.twoFactorEnabled.collectAsState()
   val userAppeals by repository.userAppeals.collectAsState()
+  val notifications by repository.notifications.collectAsState()
+  val notificationPreferences by repository.notificationPreferences.collectAsState()
+  val unreadNotificationsCount = notifications.count { !it.isRead }
 
   Scaffold(
     modifier = modifier.fillMaxSize(),
@@ -127,6 +131,8 @@ fun PruconApp(
         onCreatorConsoleClick = { showCreatorConsole = true },
         onAdminDashboardClick = { showAdminDashboard = true },
         onSafetyDashboardClick = { showSafetyDashboard = true },
+        onNotificationsClick = { showNotificationsDialog = true },
+        unreadNotificationsCount = unreadNotificationsCount,
         onAuthClick = { showAuthDialog = true },
         onMenuClick = { showMenuDialog = true }
       )
@@ -424,6 +430,30 @@ fun PruconApp(
       onToggleTwoFactor = { repository.toggleTwoFactor() },
       onExportData = { repository.exportUserDataJson() },
       onDismiss = { showSafetyDashboard = false }
+    )
+  }
+
+  // Real-Time Notification Center Dialog
+  if (showNotificationsDialog) {
+    com.example.ui.components.NotificationsCenterDialog(
+      notifications = notifications,
+      preferences = notificationPreferences,
+      onDismiss = { showNotificationsDialog = false },
+      onMarkAsRead = { notifId -> repository.markNotificationAsRead(notifId) },
+      onMarkAllAsRead = { repository.markAllNotificationsAsRead() },
+      onDeleteNotification = { notifId -> repository.deleteNotification(notifId) },
+      onClearAll = { repository.clearAllNotifications() },
+      onUpdatePreferences = { prefs -> repository.updateNotificationPreferences(prefs) },
+      onNavigateToTarget = { destination ->
+        when (destination) {
+          "chat", "groups", "discord" -> selectedTab = PruconTab.GROUPS
+          "timeline" -> selectedTab = PruconTab.TIMELINE
+          "profile" -> selectedTab = PruconTab.PROFILE
+          "tournaments" -> selectedTab = PruconTab.TOURNAMENTS
+          "leaderboard" -> selectedTab = PruconTab.LEADERBOARD
+          else -> {}
+        }
+      }
     )
   }
 }

@@ -144,6 +144,47 @@ data class Announcement(
   val privacyLevel: String = "Public"
 )
 
+enum class NotificationType(val label: String, val iconEmoji: String) {
+  NEW_MESSAGE("Message", "💬"),
+  MESSAGE_REPLY("Réponse", "↩️"),
+  MENTION("Mention", "📣"),
+  REACTION("Réaction", "🔥"),
+  FRIEND_REQUEST("Demande d'ami", "👥"),
+  FRIEND_ACCEPTED("Ami accepté", "🤝"),
+  GROUP_INVITATION("Invitation Groupe", "🎮"),
+  ROOM_INVITATION("Salon", "🎙️"),
+  SECURITY_ALERT("Alerte Sécurité", "🛡️"),
+  SYSTEM_NOTIFICATION("Système", "⚡")
+}
+
+data class AppNotification(
+  val id: String,
+  val type: NotificationType,
+  val title: String,
+  val message: String,
+  val senderName: String = "",
+  val senderAvatar: String = "",
+  val timestamp: String = "À l'instant",
+  val isRead: Boolean = false,
+  val actionTargetId: String = "",
+  val deepLinkDestination: String = ""
+)
+
+data class NotificationPreferences(
+  val inAppNotifications: Boolean = true,
+  val pushNotifications: Boolean = true,
+  val emailDigest: Boolean = false,
+  val notifyNewMessages: Boolean = true,
+  val notifyMentions: Boolean = true,
+  val notifyReactions: Boolean = true,
+  val notifyFriendRequests: Boolean = true,
+  val notifyGroupInvites: Boolean = true,
+  val notifySecurityAlerts: Boolean = true,
+  val quietHoursEnabled: Boolean = false,
+  val quietHoursStart: String = "23:00",
+  val quietHoursEnd: String = "07:00"
+)
+
 data class Tournament(
   val id: String,
   val title: String,

@@ -1,0 +1,233 @@
+================================================================================
+STRUCTURE COMPLÈTE DU PROJET ET GUIDE D'OUVERTURE DE CHAQUE ÉLÉMENT
+================================================================================
+Application : CGC (Communauté des Gamers Congolais)
+Plateforme   : Android (Jetpack Compose & Kotlin)
+Date        : 2026
+
+Ce document détaille l'arborescence des dossiers et fichiers, le rôle précis
+de chaque structure de code, ainsi que les mécanismes déclencheurs d'ouverture
+(écrans, dialogues, tiroirs, onglets et modales).
+
+--------------------------------------------------------------------------------
+1. ARBORESCENCE PHYSIQUE DU CODE SOURCE
+--------------------------------------------------------------------------------
+/
+├── metadata.json
+├── settings.gradle.kts
+├── build.gradle.kts
+└── app/
+    ├── build.gradle.kts
+    └── src/main/
+        ├── AndroidManifest.xml
+        └── java/com/example/
+            ├── MainActivity.kt
+            ├── data/
+            │   ├── model/
+            │   │   ├── AdminDashboardModels.kt
+            │   │   ├── PruconModels.kt
+            │   │   └── UserSafetyModels.kt
+            │   └── repository/
+            │       └── PruconRepository.kt
+            └── ui/
+                ├── PruconApp.kt
+                ├── theme/
+                │   ├── Color.kt
+                │   ├── Theme.kt
+                │   └── Type.kt
+                ├── screens/
+                │   ├── TimelineScreen.kt
+                │   ├── TournamentsScreen.kt
+                │   ├── GroupsChatScreen.kt
+                │   ├── ProfileScreen.kt
+                │   ├── LeaderboardScreen.kt
+                │   └── MenuScreen.kt
+                └── components/
+                    ├── PruconHeader.kt
+                    ├── NotificationsCenterDialog.kt
+                    ├── UserSafetyDashboardDialog.kt
+                    ├── CreatorConsoleDialog.kt
+                    ├── AdvancedAdminDashboardDialog.kt
+                    ├── AuthDialog.kt
+                    ├── GamerCardView.kt
+                    └── TopPlayersLeaderboardCard.kt
+
+
+--------------------------------------------------------------------------------
+2. EXPLICATION DÉTAILLÉE DE CHAQUE FICHIER ET DE SA STRUCTURE
+--------------------------------------------------------------------------------
+
+[POINT D'ENTRÉE SYSTÈME]
+• MainActivity.kt :
+  - Structure : Activité principale Android héritant de ComponentActivity.
+  - Fonction : Active le mode bord à bord (`enableEdgeToEdge()`) et charge le
+    thème principal `PruconTheme` contenant `PruconApp()`.
+
+[COUCHE DONNÉES & MODÈLES] (data/)
+• data/model/PruconModels.kt :
+  - Structure : Classes de données (GamerProfile, UserRole, DiscordChannel,
+    ChatMessage, Announcement, Tournament, LiveStream, AppNotification, etc.).
+  - Rôle : Définit toutes les entités métier du réseau social, des salons de
+    discussion, des tournois et des notifications.
+
+• data/model/UserSafetyModels.kt :
+  - Structure : Modèles de protection utilisateur (UserPrivacyCenterSettings,
+    UserCommunicationControls, BlockedUserItem, MutedUserItem, UserSubmittedReport,
+    EmergencySafetyShieldState, UserActiveSession).
+  - Rôle : Structure le système de sécurité personnelle, d'anti-harcèlement et
+    de gestion des sessions sans fuite de données.
+
+• data/model/AdminDashboardModels.kt :
+  - Structure : Modèles de gouvernance plateforme (PlatformAuditLog, SecurityAlert,
+    SupportTicket, SystemMetricPoint, ManagedPlatformUser, ManagedRoom).
+  - Rôle : Structure la console d'administration et la surveillance système.
+
+• data/repository/PruconRepository.kt :
+  - Structure : Dépôt central réactif basé sur Kotlin Coroutines `StateFlow`
+    et `MutableStateFlow`.
+  - Rôle : Gère l'état global et les opérations en temps réel :
+    * Envoi et distribution des messages de chat et jets de dés (RNG).
+    * Ajout de publications, commentaires et réactions instantanées.
+    * Système de notifications (In-app, Push, marquage lu/non lu).
+    * Blocages en 2 clics, sourdines et soumission de signalements anonymes.
+    * Gestion des sessions actives et authentification à deux facteurs (2FA).
+
+[COUCHE PRÉSENTATION & ORCHESTRATION] (ui/)
+• ui/PruconApp.kt :
+  - Structure : Composable racine de l'interface utilisateur.
+  - Rôle : Gère le Scaffold global, la barre de navigation inférieure (Tabs),
+    la barre d'en-tête (Header) et l'ouverture conditionnelle de toutes les
+    boîtes de dialogue et modales.
+
+• ui/theme/ (Color.kt, Theme.kt, Type.kt) :
+  - Structure : Système de design Material Design 3 personnalisé Cyberpunk / Discord.
+  - Rôle : Fournit les palettes de couleurs néon (CyanNeon, EmeraldNeon, GoldNeon,
+    PinkNeon, DiscordBlurple, DiscordDark, CyberBlack) et les styles typographiques.
+
+
+--------------------------------------------------------------------------------
+3. EXPLICATION DE CHAQUE ÉCRAN ET SES CONDITIONS D'OUVERTURE
+--------------------------------------------------------------------------------
+
+1. Écran Fil d'Actualité (TimelineScreen.kt)
+   - Comment il s'ouvre :
+     * Sélection de l'onglet "Accueil" dans la barre de navigation inférieure.
+     * Clic sur le logo CGC dans l'en-tête supérieur.
+     * Clic sur une notification pointant vers le flux social.
+   - Ce qu'il contient :
+     * Bannières de statut et filtres par étiquette (Tout, CGC, Tournoi, Event, etc.).
+     * Récits interactifs (Stories) et direct vidéo (LiveStreams TikTok / YouTube).
+     * Publications du journal de la communauté avec réactions (🔥, 🎮, 🏆, ❤️)
+       et espace de commentaires déroulant.
+
+2. Écran des Tournois (TournamentsScreen.kt)
+   - Comment il s'ouvre :
+     * Sélection de l'onglet "Tournois" dans la barre de navigation inférieure.
+     * Clic sur une notification d'invitation à un tournoi.
+   - Ce qu'il contient :
+     * Liste des compétitions (FC 25, Warzone, Street Fighter 6, PUBG Mobile).
+     * Modalité d'inscription en direct, statut des places remplies et cashprizes.
+     * Modalités des règles officielles et calendrier des matchs.
+
+3. Écran des Salons & Messagerie Discord (GroupsChatScreen.kt)
+   - Comment il s'ouvre :
+     * Sélection de l'onglet "Discord" dans la barre de navigation inférieure.
+     * Clic sur l'icône de message ou sur une notification de nouveau message.
+   - Ce qu'il contient :
+     * Rail de serveurs Discord (icône CGC, DMs, exploration).
+     * Barre latérale pliable des salons textuels, vocaux et chiffrés E2EE.
+     * Zone de discussion avec messages en temps réel, embeds de dés (🎲),
+       réactions par émojis et contrôles audio (Mute/Deafen).
+     * Protection intégrée : bouclier de sécurité sur chaque message tiers
+       permettant de bloquer en 2 clics ou de signaler anonymement.
+
+4. Écran Profil Joueur (ProfileScreen.kt)
+   - Comment il s'ouvre :
+     * Sélection de l'onglet "Profil" dans la barre de navigation inférieure.
+     * Clic sur la photo de profil / avatar dans l'en-tête supérieur.
+   - Ce qu'il contient :
+     * Bannière de couverture personnalisable (Cyber Gold, Fire Leopard, etc.).
+     * Carte d'identité Gamer, niveau, XP, jetons et roue quotidienne (Daily Spin).
+     * Journal personnel des publications et onglet de sécurité zéro-fuite.
+
+5. Écran Classement (LeaderboardScreen.kt)
+   - Comment il s'ouvre :
+     * Sélection de l'onglet "Classement" dans la barre de navigation inférieure.
+     * Clic sur "Voir tout le classement" depuis le widget de la Timeline.
+   - Ce qu'il contient :
+     * Podium animé des 3 meilleurs joueurs (Or, Argent, Bronze).
+     * Tableau général des joueurs congolais avec ratios de victoires, clans et XP.
+
+
+--------------------------------------------------------------------------------
+4. EXPLICATION DE CHAQUE COMPOSANT D'OUVERTURE (DIALOGUES ET MODALES)
+--------------------------------------------------------------------------------
+
+A. Centre de Notifications (NotificationsCenterDialog.kt)
+   - Déclencheur d'ouverture :
+     * Clic sur la cloche de notification située dans l'en-tête supérieur (PruconHeader).
+     * Le badge dynamique affiche en temps réel le nombre de notifications non lues.
+   - Fonctionnalités intérieures :
+     * Onglets "Toutes", "Non lues" et "Réglages".
+     * Marquer comme lu, tout marquer, supprimer et deep-linking vers les salons/tournois.
+     * Paramètres de réception push, in-app et mode heures silencieuses.
+
+B. Espace Liberté, Confort & Sécurité (UserSafetyDashboardDialog.kt)
+   - Déclencheur d'ouverture :
+     * Clic sur le bouclier vert "Sécurité" dans l'en-tête (PruconHeader).
+     * Clic sur "Espace Sécurité" depuis le menu latéral ou le profil.
+   - Fonctionnalités intérieures :
+     * Score de sécurité & activation du Bouclier d'Urgence en 1 clic.
+     * Centre de confidentialité (visibilité du statut en ligne, masquage e-mail).
+     * Contrôles de communication (qui peut appeler/écrire).
+     * Liste des personnes bloquées (déblocage en 1 clic) et sourdines actives.
+     * Historique des signalements, réclamations et gestion des sessions actives.
+
+C. Menu Général de l'Application (MenuScreen.kt -> MenuDialog)
+   - Déclencheur d'ouverture :
+     * Clic sur le bouton menu (hamburger) à l'extrême droite de l'en-tête supérieur.
+   - Fonctionnalités intérieures :
+     * Raccourcis vers tous les modules (Profil, Console Créateur, Admin, Sécurité).
+     * Section officielle "À Propos de la CGC" et règles de la communauté.
+     * Paramètres rapides de notifications et mode économie de données.
+
+D. Console Suprême du Créateur (CreatorConsoleDialog.kt)
+   - Déclencheur d'ouverture :
+     * Clic sur le badge "👑 CRÉATEUR" ou le bouton "Console" dans l'en-tête
+       (visible et accessible avec le profil Zenil / Rôle CREATOR).
+   - Fonctionnalités intérieures :
+     * Gestion des privilèges d'immunité totale.
+     * Publication prioritaire d'annonces officielles et attribution d'XP/Jetons.
+     * Surveillance directe de l'intégrité de la plateforme.
+
+E. Tableau de Bord d'Administration Avancé (AdvancedAdminDashboardDialog.kt)
+   - Déclencheur d'ouverture :
+     * Clic sur l'icône de bouclier administrateur ou via le Menu.
+   - Fonctionnalités intérieures :
+     * Métriques serveur et charge système en temps réel.
+     * Gestion des utilisateurs, modération des salons et gestion des clés API.
+     * Journaux d'audit de sécurité et traitement des tickets de support.
+
+F. Dialogue d'Authentification & Compte (AuthDialog.kt)
+   - Déclencheur d'ouverture :
+     * Clic sur le bouton de connexion/changement de compte dans l'en-tête.
+   - Fonctionnalités intérieures :
+     * Connexion sécurisée avec e-mail, pseudo secret et code secret.
+     * Protection anti-fuite : les identifiants ne sont jamais transmis en clair.
+
+G. Modale des Membres du Salon (dans GroupsChatScreen.kt)
+   - Déclencheur d'ouverture :
+     * Clic sur l'icône de groupe d'utilisateurs en haut à droite du salon Discord actif.
+   - Fonctionnalités intérieures :
+     * Liste des participants du salon avec statut en ligne et rôle.
+     * Rappel de sécurité et chiffrement des données.
+
+H. Dialogue d'Action de Sécurité Rapide (dans GroupsChatScreen.kt)
+   - Déclencheur d'ouverture :
+     * Clic sur le petit bouclier présent sur chaque message d'un autre utilisateur.
+   - Fonctionnalités intérieures :
+     * Blocage instantané en 2 clics de l'utilisateur.
+     * Formulaire guidé en 3 étapes de signalement anonyme et sécurisé.
+================================================================================
+FIN DU DOCUMENT DE STRUCTURE
+================================================================================

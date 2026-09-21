@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ElectricBolt
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.filled.Wifi
@@ -50,9 +51,11 @@ import com.example.ui.theme.CyberCardBorder
 import com.example.ui.theme.CyanGlow
 import com.example.ui.theme.CyanNeon
 import com.example.ui.theme.DarkSurface
+import com.example.ui.theme.DiscordBlurple
 import com.example.ui.theme.EmeraldGlow
 import com.example.ui.theme.EmeraldNeon
 import com.example.ui.theme.GoldNeon
+import com.example.ui.theme.PinkNeon
 import com.example.ui.theme.TextMuted
 import com.example.ui.theme.TextPrimary
 import com.example.ui.theme.TextSecondary
@@ -65,6 +68,8 @@ fun PruconHeader(
   onCreatorConsoleClick: () -> Unit = {},
   onAdminDashboardClick: () -> Unit = {},
   onSafetyDashboardClick: () -> Unit = {},
+  onNotificationsClick: () -> Unit = {},
+  unreadNotificationsCount: Int = 0,
   onAuthClick: () -> Unit = {},
   onMenuClick: () -> Unit = {}
 ) {
@@ -320,6 +325,45 @@ fun PruconHeader(
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold
               )
+            }
+          }
+
+          Spacer(modifier = Modifier.width(6.dp))
+
+          // Quick Notifications Bell button
+          Surface(
+            onClick = onNotificationsClick,
+            shape = RoundedCornerShape(20.dp),
+            color = if (unreadNotificationsCount > 0) DiscordBlurple.copy(alpha = 0.2f) else DarkSurface,
+            border = androidx.compose.foundation.BorderStroke(1.dp, if (unreadNotificationsCount > 0) DiscordBlurple else CyberCardBorder),
+            modifier = Modifier.testTag("header_notifications_button")
+          ) {
+            Row(
+              modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Icon(
+                imageVector = Icons.Default.Notifications,
+                contentDescription = "Notifications",
+                tint = if (unreadNotificationsCount > 0) DiscordBlurple else TextSecondary,
+                modifier = Modifier.size(15.dp)
+              )
+              if (unreadNotificationsCount > 0) {
+                Spacer(modifier = Modifier.width(4.dp))
+                Box(
+                  modifier = Modifier
+                    .clip(CircleShape)
+                    .background(PinkNeon)
+                    .padding(horizontal = 4.dp, vertical = 1.dp)
+                ) {
+                  Text(
+                    text = "$unreadNotificationsCount",
+                    color = Color.White,
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Black
+                  )
+                }
+              }
             }
           }
 

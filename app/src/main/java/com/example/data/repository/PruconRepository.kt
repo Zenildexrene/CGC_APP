@@ -2,12 +2,15 @@ package com.example.data.repository
 
 import com.example.data.model.AboutCgcMessage
 import com.example.data.model.Announcement
+import com.example.data.model.AppNotification
 import com.example.data.model.ChatMessage
 import com.example.data.model.DiscordChannel
 import com.example.data.model.GamerProfile
 import com.example.data.model.GamingGroup
 import com.example.data.model.LeaderboardGamer
 import com.example.data.model.LiveStream
+import com.example.data.model.NotificationPreferences
+import com.example.data.model.NotificationType
 import com.example.data.model.PostComment
 import com.example.data.model.PrivacySettings
 import com.example.data.model.Tournament
@@ -1438,5 +1441,109 @@ class PruconRepository {
       ipAddress = "105.102.14.22"
     )
     _auditLogs.update { listOf(newEntry) + it }
+  }
+
+  // ===========================================================================
+  // REAL-TIME NOTIFICATION SYSTEM (In-App, Push & Digest)
+  // ===========================================================================
+  private val _notifications = MutableStateFlow<List<AppNotification>>(
+    listOf(
+      AppNotification(
+        id = "notif_welcome",
+        type = NotificationType.SYSTEM_NOTIFICATION,
+        title = "Bienvenue sur la CGC",
+        message = "Votre compte a été initialisé avec succès. Espace sécurisé actif.",
+        senderName = "Système CGC",
+        timestamp = "À l'instant",
+        isRead = false
+      ),
+      AppNotification(
+        id = "notif_security",
+        type = NotificationType.SECURITY_ALERT,
+        title = "Bouclier Zéro-Fuite Actif",
+        message = "Chiffrement TLS 1.3 et protections de confidentialité opérationnels.",
+        senderName = "Noyau Sécurité",
+        timestamp = "Il y a 5m",
+        isRead = false
+      ),
+      AppNotification(
+        id = "notif_group",
+        type = NotificationType.ROOM_INVITATION,
+        title = "Salon Discord #général-rdc",
+        message = "Vous avez rejoint automatiquement le salon communautaire principal.",
+        senderName = "CGC Bot",
+        timestamp = "Il y a 10m",
+        isRead = true
+      )
+    )
+  )
+  val notifications: StateFlow<List<AppNotification>> = _notifications.asStateFlow()
+
+  private val _notificationPreferences = MutableStateFlow(NotificationPreferences())
+  val notificationPreferences: StateFlow<NotificationPreferences> = _notificationPreferences.asStateFlow()
+
+  fun markNotificationAsRead(notificationId: String) {
+    _notifications.update { list ->
+      list.map { notif ->
+        if (notif.id == notificationId) notif.copy(isRead = true) else notif
+      }
+    }
+  }
+
+  fun markAllNotificationsAsRead() {
+    _notifications.update { list ->
+      list.map { it.copy(isRead = true) }
+    }
+  }
+
+  fun deleteNotification(notificationId: String) {
+    _notifications.update { list ->
+      list.filterNot { it.id == notificationId }
+    }
+  }
+
+  fun clearAllNotifications() {
+    _notifications.value = emptyList()
+  }
+
+  fun updateNotificationPreferences(prefs: NotificationPreferences) {
+    _notificationPreferences.value = prefs
+  }
+
+  fun postNotification(
+    type: NotificationType,
+    title: String,
+    message: String,
+    senderName: String = "CGC",
+    actionTargetId: String = "",
+    deepLink: String = ""
+  ) {
+    val prefs = _notificationPreferences.value
+    // Check if category is enabled in user preferences
+    val isEnabled = when (type) {
+      NotificationType.NEW_MESSAGE -> prefs.notifyNewMessages
+      NotificationType.MESSAGE_REPLY -> prefs.notifyNewMessages
+      NotificationType.MENTION -> prefs.notifyMentions
+      NotificationType.REACTION -> prefs.notifyReactions
+      NotificationType.FRIEND_REQUEST, NotificationType.FRIEND_ACCEPTED -> prefs.notifyFriendRequests
+      NotificationType.GROUP_INVITATION, NotificationType.ROOM_INVITATION -> prefs.notifyGroupInvites
+      NotificationType.SECURITY_ALERT -> prefs.notifySecurityAlerts
+      NotificationType.SYSTEM_NOTIFICATION -> true
+    }
+
+    if (!isEnabled) return
+
+    val newNotification = AppNotification(
+      id = "notif_${System.currentTimeMillis()}",
+      type = type,
+      title = title,
+      message = message,
+      senderName = senderName,
+      timestamp = "À l'instant",
+      isRead = false,
+      actionTargetId = actionTargetId,
+      deepLinkDestination = deepLink
+    )
+    _notifications.update { listOf(newNotification) + it }
   }
 }

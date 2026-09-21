@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ElectricBolt
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.filled.Wifi
@@ -47,6 +48,7 @@ import com.example.ui.theme.CyberCard
 import com.example.ui.theme.CyberCardBorder
 import com.example.ui.theme.CyanGlow
 import com.example.ui.theme.CyanNeon
+import com.example.ui.theme.DarkSurface
 import com.example.ui.theme.EmeraldGlow
 import com.example.ui.theme.EmeraldNeon
 import com.example.ui.theme.GoldNeon
@@ -60,7 +62,8 @@ fun PruconHeader(
   modifier: Modifier = Modifier,
   onProfileClick: () -> Unit = {},
   onCreatorConsoleClick: () -> Unit = {},
-  onAuthClick: () -> Unit = {}
+  onAuthClick: () -> Unit = {},
+  onMenuClick: () -> Unit = {}
 ) {
   val infiniteTransition = rememberInfiniteTransition(label = "pulse")
   val pulseAlpha by infiniteTransition.animateFloat(
@@ -292,6 +295,36 @@ fun PruconHeader(
                 color = GoldNeon,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold
+              )
+            }
+          }
+
+          Spacer(modifier = Modifier.width(6.dp))
+
+          // Menu Button (Settings & À Propos CGC)
+          Surface(
+            onClick = onMenuClick,
+            shape = RoundedCornerShape(20.dp),
+            color = DarkSurface,
+            border = androidx.compose.foundation.BorderStroke(1.dp, EmeraldNeon.copy(alpha = 0.6f)),
+            modifier = Modifier.testTag("header_menu_button")
+          ) {
+            Row(
+              modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Icon(
+                imageVector = Icons.Default.Menu,
+                contentDescription = "Menu et Paramètres",
+                tint = EmeraldGlow,
+                modifier = Modifier.size(15.dp)
+              )
+              Spacer(modifier = Modifier.width(4.dp))
+              Text(
+                text = "MENU",
+                color = EmeraldGlow,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Black
               )
             }
           }

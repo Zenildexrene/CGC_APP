@@ -10,15 +10,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.DynamicFeed
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Forum
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Leaderboard
+import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.DynamicFeed
 import androidx.compose.material.icons.outlined.EmojiEvents
 import androidx.compose.material.icons.outlined.Forum
+import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Leaderboard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -61,10 +65,10 @@ enum class PruconTab(
   val unselectedIcon: ImageVector,
   val testTag: String
 ) {
-  TIMELINE("Timeline", Icons.Filled.DynamicFeed, Icons.Outlined.DynamicFeed, "tab_timeline"),
+  TIMELINE("Accueil", Icons.Filled.Home, Icons.Outlined.Home, "tab_timeline"),
   TOURNAMENTS("Tournois", Icons.Filled.EmojiEvents, Icons.Outlined.EmojiEvents, "tab_tournaments"),
-  GROUPS("Salons", Icons.Filled.Forum, Icons.Outlined.Forum, "tab_groups"),
-  PROFILE("Gamer Card", Icons.Filled.Badge, Icons.Outlined.Badge, "tab_profile"),
+  GROUPS("Discord", Icons.Filled.Forum, Icons.Outlined.Forum, "tab_groups"),
+  PROFILE("Profil", Icons.Filled.AccountCircle, Icons.Outlined.AccountCircle, "tab_profile"),
   LEADERBOARD("Classement", Icons.Filled.Leaderboard, Icons.Outlined.Leaderboard, "tab_leaderboard")
 }
 
@@ -76,6 +80,7 @@ fun PruconApp(
   var selectedTab by remember { mutableStateOf(PruconTab.TIMELINE) }
   var showCreatorConsole by remember { mutableStateOf(false) }
   var showAuthDialog by remember { mutableStateOf(false) }
+  var showMenuDialog by remember { mutableStateOf(false) }
 
   val profile by repository.profile.collectAsState()
   val allUsers by repository.allUsers.collectAsState()
@@ -84,6 +89,11 @@ fun PruconApp(
   val groups by repository.groups.collectAsState()
   val chatMessages by repository.chatMessages.collectAsState()
   val leaderboard by repository.leaderboard.collectAsState()
+  val stories by repository.stories.collectAsState()
+  val discordChannels by repository.discordChannels.collectAsState()
+  val privacySettings by repository.privacySettings.collectAsState()
+  val liveStreams by repository.liveStreams.collectAsState()
+  val aboutCgcMessages by repository.aboutCgcMessages.collectAsState()
 
   Scaffold(
     modifier = modifier.fillMaxSize(),
@@ -93,7 +103,8 @@ fun PruconApp(
         profile = profile,
         onProfileClick = { selectedTab = PruconTab.PROFILE },
         onCreatorConsoleClick = { showCreatorConsole = true },
-        onAuthClick = { showAuthDialog = true }
+        onAuthClick = { showAuthDialog = true },
+        onMenuClick = { showMenuDialog = true }
       )
     },
     bottomBar = {
@@ -147,11 +158,27 @@ fun PruconApp(
         PruconTab.TIMELINE -> {
           TimelineScreen(
             announcements = announcements,
+            stories = stories,
+            liveStreams = liveStreams,
+            currentUserName = profile.secretName,
+            currentUserRole = profile.role,
             onAddAnnouncement = { title, content, tag ->
               repository.addAnnouncement(title, content, tag)
             },
             onToggleReaction = { annId, reaction ->
               repository.toggleReaction(annId, reaction)
+            },
+            onAddComment = { annId, text ->
+              repository.addCommentToAnnouncement(annId, text)
+            },
+            onSharePost = { annId ->
+              repository.shareAnnouncement(annId)
+            },
+            onCreateStory = { title, tag ->
+              repository.createStory(title, tag)
+            },
+            onAddLiveStream = { title, platform, streamUrl, gameName ->
+              repository.addLiveStream(title, platform, streamUrl, gameName)
             }
           )
         }
@@ -167,6 +194,9 @@ fun PruconApp(
           GroupsChatScreen(
             groups = groups,
             chatMessages = chatMessages,
+            discordChannels = discordChannels,
+            allUsers = allUsers,
+            currentProfile = profile,
             onSendMessage = { groupId, content ->
               repository.sendMessage(groupId, content)
             },
@@ -175,17 +205,37 @@ fun PruconApp(
             },
             onJoinGroup = { groupId ->
               repository.joinGroup(groupId)
+            },
+            onAddReaction = { groupId, msgId, reaction ->
+              repository.addChatMessageReaction(groupId, msgId, reaction)
             }
           )
         }
         PruconTab.PROFILE -> {
           ProfileScreen(
             profile = profile,
+            privacySettings = privacySettings,
+            announcements = announcements,
             onConvertXp = { amount -> repository.convertXpToTokens(amount) },
             onGiveXp = { amount -> repository.giveXp(amount) },
             onDailySpin = { repository.playDailySpin() },
             onUpdateProfile = { name, title, clan ->
               repository.updateProfile(name, title, clan)
+            },
+            onUpdateExtendedProfile = { name, title, clan, bio, location, coverTheme ->
+              repository.updateExtendedProfile(name, title, clan, bio, location, coverTheme)
+            },
+            onUpdateJournalCustomization = { bio, motto, location, coverTheme, platform, clan ->
+              repository.updateJournalCustomization(bio, motto, location, coverTheme, platform, clan)
+            },
+            onToggleHideEmail = { repository.toggleHideEmail() },
+            onToggleHideCode = { repository.toggleHideSecretCode() },
+            onToggleE2EE = { repository.toggleE2EE() },
+            onAddAnnouncement = { title, content, tag ->
+              repository.addJournalPost(title, content, tag)
+            },
+            onDeletePost = { postId ->
+              repository.deleteMyPost(postId)
             },
             onOpenCreatorConsole = { showCreatorConsole = true },
             onOpenAuth = { showAuthDialog = true }
@@ -208,7 +258,7 @@ fun PruconApp(
       groups = groups,
       onNominateRole = { userId, role -> repository.nominateRole(userId, role) },
       onDeleteUser = { userId -> repository.deleteUser(userId) },
-      onRegisterPlayer = { name, email, code -> repository.registerNewPlayer(name, email, code) },
+      onRegisterPlayer = { pseudo, uid, code -> repository.registerNewPlayer(pseudo, uid, code) },
       onCreateTournament = { title, game, platform, prize, fee, date, slots, desc, rules ->
         repository.createTournament(title, game, platform, prize, fee, date, slots, desc, rules)
       },
@@ -228,10 +278,37 @@ fun PruconApp(
     com.example.ui.components.AuthDialog(
       currentProfile = profile,
       allUsers = allUsers,
-      onLogin = { email, code -> repository.login(email, code) },
-      onRegister = { name, email, code -> repository.registerNewPlayer(name, email, code) },
+      onLogin = { identifier, code -> repository.login(identifier, code) },
+      onRegister = { pseudo, uid, code -> repository.registerNewPlayer(pseudo, uid, code) },
       onSwitchUser = { userId -> repository.switchUser(userId) },
       onDismiss = { showAuthDialog = false }
+    )
+  }
+
+  // Menu & Settings with Admin About CGC modal
+  if (showMenuDialog) {
+    com.example.ui.screens.MenuDialog(
+      profile = profile,
+      privacySettings = privacySettings,
+      aboutMessages = aboutCgcMessages,
+      onDismiss = { showMenuDialog = false },
+      onProfileClick = {
+        showMenuDialog = false
+        selectedTab = PruconTab.PROFILE
+      },
+      onCreatorConsoleClick = {
+        showMenuDialog = false
+        showCreatorConsole = true
+      },
+      onAuthClick = {
+        showMenuDialog = false
+        showAuthDialog = true
+      },
+      onToggleHideEmail = { repository.toggleHideEmail() },
+      onToggleHideCode = { repository.toggleHideSecretCode() },
+      onToggleE2EE = { repository.toggleE2EE() },
+      onAddAboutMessage = { title, content -> repository.addAboutCgcMessage(title, content) },
+      onDeleteAboutMessage = { id -> repository.deleteAboutCgcMessage(id) }
     )
   }
 }

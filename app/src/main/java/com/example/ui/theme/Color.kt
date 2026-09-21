@@ -18,6 +18,15 @@ val PurpleGlow = Color(0xFFA78BFA)
 val PinkNeon = Color(0xFFEC4899)
 val GoldNeon = Color(0xFFF59E0B)
 
+// Facebook & Discord Accents
+val FacebookBlue = Color(0xFF1877F2)
+val FacebookBlueMuted = Color(0xFF1659B8)
+val DiscordBlurple = Color(0xFF5865F2)
+val DiscordDark = Color(0xFF2B2D31)
+val DiscordChannelBar = Color(0xFF1E1F22)
+val DiscordChatBackground = Color(0xFF313338)
+val DiscordMessageHover = Color(0xFF2E3035)
+
 val TextPrimary = Color(0xFFF9FAFB)
 val TextSecondary = Color(0xFF94A3B8)
 val TextMuted = Color(0xFF64748B)

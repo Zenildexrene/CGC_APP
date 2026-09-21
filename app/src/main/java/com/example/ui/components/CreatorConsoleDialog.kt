@@ -101,7 +101,7 @@ fun CreatorConsoleDialog(
   groups: List<GamingGroup>,
   onNominateRole: (userId: String, role: UserRole) -> Pair<Boolean, String>,
   onDeleteUser: (userId: String) -> Pair<Boolean, String>,
-  onRegisterPlayer: (name: String, email: String, code: String) -> Pair<Boolean, String>,
+  onRegisterPlayer: (pseudo: String, uid: String, code: String) -> Pair<Boolean, String>,
   onCreateTournament: (title: String, game: String, platform: String, prize: String, fee: String, date: String, slots: Int, desc: String, rules: List<String>) -> Boolean,
   onDeleteTournament: (String) -> Boolean,
   onCreateAnnouncement: (title: String, content: String, tag: String, isPinned: Boolean) -> Unit,
@@ -332,8 +332,8 @@ fun CreatorConsoleDialog(
   if (showCreateUserDialog) {
     CreateUserModal(
       onDismiss = { showCreateUserDialog = false },
-      onCreate = { name, email, code ->
-        val (ok, msg) = onRegisterPlayer(name, email, code)
+      onCreate = { pseudo, uid, code ->
+        val (ok, msg) = onRegisterPlayer(pseudo, uid, code)
         feedbackMessage = msg
         showCreateUserDialog = false
       }
@@ -492,13 +492,14 @@ private fun UserManagementRow(
         }
 
         Text(
-          text = user.email,
-          color = TextSecondary,
-          fontSize = 10.sp
+          text = "UID: ${user.uid} (Visible Admin)",
+          color = GoldNeon,
+          fontSize = 10.sp,
+          fontWeight = FontWeight.Bold
         )
         Text(
-          text = "Code: ${user.secretCode} • LVL ${user.level} • ${user.xp} XP",
-          color = TextMuted,
+          text = "Statut: ${user.title} • LVL ${user.level} • ${user.clan}",
+          color = TextSecondary,
           fontSize = 9.sp
         )
       }
@@ -822,10 +823,10 @@ private fun GroupsManagementTab(
 @Composable
 private fun CreateUserModal(
   onDismiss: () -> Unit,
-  onCreate: (name: String, email: String, code: String) -> Unit
+  onCreate: (pseudo: String, uid: String, code: String) -> Unit
 ) {
-  var name by remember { mutableStateOf("") }
-  var email by remember { mutableStateOf("") }
+  var pseudo by remember { mutableStateOf("") }
+  var uid by remember { mutableStateOf("") }
   var code by remember { mutableStateOf("") }
 
   AlertDialog(
@@ -834,9 +835,10 @@ private fun CreateUserModal(
     text = {
       Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
         OutlinedTextField(
-          value = name,
-          onValueChange = { name = it },
-          label = { Text("Pseudo / Gamer Tag") },
+          value = pseudo,
+          onValueChange = { pseudo = it },
+          label = { Text("Pseudo de Gamer (Public)") },
+          placeholder = { Text("Ex: KinshasaGamer, SniperRDC", color = TextMuted) },
           colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = TextPrimary,
             unfocusedTextColor = TextPrimary,
@@ -846,9 +848,10 @@ private fun CreateUserModal(
           modifier = Modifier.fillMaxWidth()
         )
         OutlinedTextField(
-          value = email,
-          onValueChange = { email = it },
-          label = { Text("Adresse Email") },
+          value = uid,
+          onValueChange = { uid = it.uppercase() },
+          label = { Text("UID Joueur (Confidentiel)") },
+          placeholder = { Text("Ex: CGC-78210", color = TextMuted) },
           colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = TextPrimary,
             unfocusedTextColor = TextPrimary,
@@ -860,7 +863,7 @@ private fun CreateUserModal(
         OutlinedTextField(
           value = code,
           onValueChange = { code = it },
-          label = { Text("Code d'accès secret") },
+          label = { Text("Mot de passe secret") },
           colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = TextPrimary,
             unfocusedTextColor = TextPrimary,
@@ -873,8 +876,8 @@ private fun CreateUserModal(
     },
     confirmButton = {
       Button(
-        onClick = { onCreate(name, email, code) },
-        enabled = name.isNotBlank() && email.isNotBlank() && code.isNotBlank(),
+        onClick = { onCreate(pseudo, uid, code) },
+        enabled = pseudo.isNotBlank() && uid.isNotBlank() && code.isNotBlank(),
         colors = ButtonDefaults.buttonColors(containerColor = EmeraldNeon)
       ) {
         Text("Inscrire", color = CyberBlack, fontWeight = FontWeight.Bold)

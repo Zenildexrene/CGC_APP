@@ -1,13 +1,19 @@
 package com.example.data.repository
 
+import com.example.data.model.AboutCgcMessage
 import com.example.data.model.Announcement
 import com.example.data.model.ChatMessage
+import com.example.data.model.DiscordChannel
 import com.example.data.model.GamerProfile
 import com.example.data.model.GamingGroup
 import com.example.data.model.LeaderboardGamer
+import com.example.data.model.LiveStream
+import com.example.data.model.PostComment
+import com.example.data.model.PrivacySettings
 import com.example.data.model.Tournament
 import com.example.data.model.TournamentStatus
 import com.example.data.model.UserRole
+import com.example.data.model.UserStory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,6 +30,7 @@ class PruconRepository {
   // Initial pristine Creator / Owner Account
   private val creatorAccount = GamerProfile(
     id = "usr_zenil_creator",
+    uid = "CGC-ADMIN-01",
     email = CREATOR_EMAIL,
     secretName = "Zenil",
     secretCode = CREATOR_CODE,
@@ -39,6 +46,13 @@ class PruconRepository {
     matchesPlayed = 0,
     winRate = "100%",
     status = "En ligne",
+    gamingMotto = "Fondateur de la Communauté Gaming Congolaise 🇨🇩",
+    bio = "Créateur & Propriétaire officiel de la plateforme CGC 🇨🇩 • Bienvenue sur le réseau social des gamers congolais !",
+    location = "Kinshasa, Gombe",
+    coverTheme = "cyber_gold",
+    favoritePlatform = "PlayStation 5",
+    favoriteGames = listOf("EA SPORTS FC 25", "Warzone", "Tekken 8", "Valorant"),
+    friendsCount = 0,
     isImmuneFromRemoval = true
   )
 
@@ -49,49 +63,65 @@ class PruconRepository {
   private val _profile = MutableStateFlow(creatorAccount)
   val profile: StateFlow<GamerProfile> = _profile.asStateFlow()
 
-  // Clean state: 1 inaugural welcome post from the Creator
-  private val _announcements = MutableStateFlow(
+  // Privacy & Anti-Data-Leak settings
+  private val _privacySettings = MutableStateFlow(PrivacySettings())
+  val privacySettings: StateFlow<PrivacySettings> = _privacySettings.asStateFlow()
+
+  // Stories (Facebook Style) - Empty initial state for a pristine launch
+  private val _stories = MutableStateFlow<List<UserStory>>(emptyList())
+  val stories: StateFlow<List<UserStory>> = _stories.asStateFlow()
+
+  // Discord channels structure
+  private val _discordChannels = MutableStateFlow(
     listOf(
-      Announcement(
-        id = "ann_1",
+      DiscordChannel("ch_annonces", "annonces-cgc", "ANNONCES & INFOS", "Canal officiel des annonces de la communauté CGC", isVoice = false),
+      DiscordChannel("ch_regles", "règles-et-sécurité", "ANNONCES & INFOS", "Règlement communautaire, fair-play et protection zéro-fuite", isVoice = false),
+      DiscordChannel("grp_1", "général-rdc", "SALONS TEXTUELS", "Discussion gaming libre entre tous les joueurs congolais", isVoice = false),
+      DiscordChannel("ch_team", "recherche-de-team", "SALONS TEXTUELS", "Recrutement et création d'équipes pour les tournois", isVoice = false),
+      DiscordChannel("ch_fc25", "fc25-tournois", "SALONS TEXTUELS", "Matchs amicaux, entraînements et tirages au sort FC 25", isVoice = false),
+      DiscordChannel("ch_clips", "clips-et-fails", "SALONS TEXTUELS", "Partage de clips vidéo et d'actions spectaculaires", isVoice = false),
+      DiscordChannel("ch_voice_kinshasa", "Kinshasa Lounge", "SALONS VOCAUX", "Salon vocal communautaire haute fidélité", isVoice = true),
+      DiscordChannel("ch_voice_match", "Match Tournoi 1v1", "SALONS VOCAUX", "Canal vocal réservé aux phases de match", isVoice = true),
+      DiscordChannel("ch_dm_support", "Support Direct Créateur", "MESSAGES DIRECTS", "Canal privé chiffré de bout en bout (E2EE)", isVoice = false, isEncrypted = true)
+    )
+  )
+  val discordChannels: StateFlow<List<DiscordChannel>> = _discordChannels.asStateFlow()
+
+  // Live Streams (TikTok Live & YouTube Live) - Empty initial state
+  private val _liveStreams = MutableStateFlow<List<LiveStream>>(emptyList())
+  val liveStreams: StateFlow<List<LiveStream>> = _liveStreams.asStateFlow()
+
+  // About CGC Official Messages (Admin editable)
+  private val _aboutCgcMessages = MutableStateFlow(
+    listOf(
+      AboutCgcMessage(
+        id = "about_1",
+        title = "Manifeste de la Communauté Gaming Congolaise (CGC)",
+        content = "La CGC (COMMUNAUTÉ GAMING CONGOLAISE) est la plateforme centrale d'esport, de cohésion et de divertissement numérique en République Démocratique du Congo. Fondée à Kinshasa, elle rassemble tous les gamers passionnés (PlayStation, Xbox, PC et Mobile) autour de compétitions équitables, de récompenses concrètes et d'un esprit communautaire d'entraide.",
         authorName = "Zenil",
-        authorLevel = 50,
-        authorTitle = "Créateur & Propriétaire",
-        title = "Bienvenue sur la CGC - Communauté Gaming Congolaise",
-        content = "L'application est officiellement déployée en direct. Le réseau est vierge et prêt à accueillir les gamers congolais. Tournois esport, salons de discussion et classements sont opérationnels !",
-        tag = "CGC",
-        timestamp = "À l'instant",
-        fireCount = 1,
-        gamepadCount = 0,
-        trophyCount = 0,
+        authorRole = UserRole.CREATOR,
+        timestamp = "Septembre 2026",
+        isPinned = true
+      ),
+      AboutCgcMessage(
+        id = "about_2",
+        title = "Sécurité & Protection des Données Zéro-Fuite",
+        content = "Notre engagement formel : aucune donnée personnelle (adresse e-mail privée, mot de passe secret, UID des joueurs) n'est jamais exposée publiquement. Les communications privées bénéficient d'un chiffrement de pointe et le noyau CGC protège rigoureusement l'intégrité de chaque compte membre.",
+        authorName = "Zenil",
+        authorRole = UserRole.CREATOR,
+        timestamp = "Septembre 2026",
         isPinned = true
       )
     )
   )
+  val aboutCgcMessages: StateFlow<List<AboutCgcMessage>> = _aboutCgcMessages.asStateFlow()
+
+  // Pristine virgin state: No publications yet
+  private val _announcements = MutableStateFlow<List<Announcement>>(emptyList())
   val announcements: StateFlow<List<Announcement>> = _announcements.asStateFlow()
 
-  // Inaugural tournament prepared for the launch
-  private val _tournaments = MutableStateFlow(
-    listOf(
-      Tournament(
-        id = "tour_1",
-        title = "Tournoi Inaugural FC 25 - Kinshasa Open",
-        gameTitle = "EA SPORTS FC 25",
-        platform = "PS5 / Console",
-        prizePool = "500 $ + 5 000 XP",
-        entryFee = "Gratuit",
-        startDate = "Inscriptions ouvertes",
-        slotsFilled = 0,
-        maxSlots = 32,
-        status = TournamentStatus.OPEN,
-        description = "Tournoi d'inauguration créé par la direction CGC.",
-        rules = listOf(
-          "Matchs en mode Compétitif standard",
-          "Fair-play strict et capture du score final obligatoire"
-        )
-      )
-    )
-  )
+  // Pristine tournaments: Empty initially
+  private val _tournaments = MutableStateFlow<List<Tournament>>(emptyList())
   val tournaments: StateFlow<List<Tournament>> = _tournaments.asStateFlow()
 
   // Clean initial gaming group: Central official lobby
@@ -157,56 +187,87 @@ class PruconRepository {
 
   // --- Authentication & User Management ---
 
-  fun login(email: String, code: String): Pair<Boolean, String> {
-    val user = _allUsers.value.find {
-      it.email.equals(email.trim(), ignoreCase = true) && it.secretCode == code.trim()
+  fun login(identifier: String, code: String): Pair<Boolean, String> {
+    val cleanId = identifier.trim()
+    val cleanCode = code.trim()
+
+    if (cleanId.isEmpty() || cleanCode.isEmpty()) {
+      return false to "Veuillez saisir votre pseudo (ou UID) et votre mot de passe."
     }
+
+    val user = _allUsers.value.find {
+      (it.secretName.equals(cleanId, ignoreCase = true) ||
+       it.uid.equals(cleanId, ignoreCase = true) ||
+       it.email.equals(cleanId, ignoreCase = true)) &&
+      it.secretCode == cleanCode
+    }
+
     return if (user != null) {
       _profile.value = user
       updateLeaderboard()
-      true to "Connexion réussie en tant que ${user.secretName} (${user.role.label})"
+      true to "Connexion réussie ! Bon retour sur votre journal, ${user.secretName}."
     } else {
-      false to "Identifiants invalides. Vérifiez l'adresse email et le code d'accès."
+      false to "Identifiants incorrects. Vérifiez votre pseudo et mot de passe."
     }
   }
 
-  fun registerNewPlayer(secretName: String, email: String, secretCode: String): Pair<Boolean, String> {
-    val cleanEmail = email.trim()
-    val cleanName = secretName.trim()
+  fun registerNewPlayer(pseudo: String, uid: String, secretCode: String): Pair<Boolean, String> {
+    val cleanPseudo = pseudo.trim()
+    val cleanUid = uid.trim().uppercase()
     val cleanCode = secretCode.trim()
 
-    if (cleanEmail.isEmpty() || cleanName.isEmpty() || cleanCode.isEmpty()) {
-      return false to "Tous les champs sont requis pour l'inscription."
+    if (cleanPseudo.isEmpty() || cleanUid.isEmpty() || cleanCode.isEmpty()) {
+      return false to "Le Pseudo, l'UID et le mot de passe sont obligatoires."
     }
 
-    if (_allUsers.value.any { it.email.equals(cleanEmail, ignoreCase = true) }) {
-      return false to "Cet email est déjà enregistré."
+    if (cleanPseudo.length < 3) {
+      return false to "Le pseudo doit faire au moins 3 caractères."
+    }
+
+    if (cleanCode.length < 4) {
+      return false to "Le mot de passe doit faire au moins 4 caractères."
+    }
+
+    if (_allUsers.value.any { it.secretName.equals(cleanPseudo, ignoreCase = true) }) {
+      return false to "Ce pseudo de gamer est déjà utilisé. Choisissez-en un autre."
+    }
+
+    if (_allUsers.value.any { it.uid.equals(cleanUid, ignoreCase = true) }) {
+      return false to "Cet UID de gamer est déjà enregistré. Veuillez en choisir un autre."
     }
 
     val newGamer = GamerProfile(
       id = "usr_${System.currentTimeMillis()}",
-      email = cleanEmail,
-      secretName = cleanName,
+      uid = cleanUid,
+      email = "${cleanPseudo.lowercase().replace(" ", "")}@cgc.cd",
+      secretName = cleanPseudo,
       secretCode = cleanCode,
       role = UserRole.PLAYER,
       level = 1,
       xp = 100,
       nextLevelXp = 500,
       tokens = 20,
-      title = "Recrue CGC",
+      title = "Gamer CGC",
       memberSince = "Septembre 2026",
-      clan = "Indépendant",
+      clan = "CGC Indépendant",
       tournamentsWon = 0,
       matchesPlayed = 0,
       winRate = "0%",
       status = "En ligne",
+      gamingMotto = "Force & Honneur sur la CGC 🇨🇩",
+      bio = "Gamer passionné CGC • Journal de $cleanPseudo 🇨🇩",
+      location = "Kinshasa, RDC",
+      coverTheme = "cyber_emerald",
+      favoritePlatform = "PlayStation 5",
+      favoriteGames = listOf("EA SPORTS FC 25", "Warzone", "Tekken 8"),
+      friendsCount = 0,
       isImmuneFromRemoval = false
     )
 
     _allUsers.update { it + newGamer }
     _profile.value = newGamer
     updateLeaderboard()
-    return true to "Compte créé avec succès ! Bienvenue, $cleanName."
+    return true to "Compte créé avec succès ! Bienvenue sur ton journal, $cleanPseudo."
   }
 
   fun switchUser(userId: String) {
@@ -319,22 +380,72 @@ class PruconRepository {
     return true
   }
 
-  fun addAnnouncement(title: String, content: String, tag: String, isPinned: Boolean = false) {
+  fun addAnnouncement(
+    title: String,
+    content: String,
+    tag: String,
+    isPinned: Boolean = false,
+    isJournalPost: Boolean = false
+  ) {
     val current = _profile.value
     val newAnnouncement = Announcement(
       id = "ann_${System.currentTimeMillis()}",
+      authorId = current.id,
       authorName = current.secretName,
+      authorRole = current.role,
       authorLevel = current.level,
       authorTitle = current.title,
-      title = title,
+      title = title.ifBlank { "Journal de ${current.secretName}" },
       content = content,
-      tag = tag,
+      tag = tag.ifBlank { "Journal" },
       timestamp = "À l'instant",
-      fireCount = 1,
-      isPinned = isPinned && current.canManageContent
+      fireCount = 0,
+      isPinned = isPinned && current.canManageContent,
+      isJournalPost = isJournalPost
     )
     _announcements.update { listOf(newAnnouncement) + it }
     awardXp(25)
+  }
+
+  fun addJournalPost(title: String = "", content: String, tag: String = "Journal"): Boolean {
+    if (content.isBlank()) return false
+    val current = _profile.value
+    addAnnouncement(
+      title = title.ifBlank { "Journal de ${current.secretName}" },
+      content = content.trim(),
+      tag = tag,
+      isPinned = false,
+      isJournalPost = true
+    )
+    return true
+  }
+
+  fun deleteMyPost(announcementId: String): Boolean {
+    val current = _profile.value
+    _announcements.update { list ->
+      list.filterNot { it.id == announcementId && (it.authorId == current.id || it.authorName == current.secretName || current.canManageContent) }
+    }
+    return true
+  }
+
+  fun updateJournalCustomization(
+    bio: String,
+    gamingMotto: String,
+    location: String,
+    coverTheme: String,
+    favoritePlatform: String,
+    clan: String
+  ) {
+    val cur = _profile.value
+    val updated = cur.copy(
+      bio = bio.trim(),
+      gamingMotto = gamingMotto.trim(),
+      location = location.trim(),
+      coverTheme = coverTheme,
+      favoritePlatform = favoritePlatform,
+      clan = clan.trim()
+    )
+    updateCurrentProfile(updated)
   }
 
   fun deleteAnnouncement(announcementId: String): Boolean {
@@ -398,6 +509,13 @@ class PruconRepository {
                 trophyCount = ann.trophyCount + (if (active) 1 else -1)
               )
             }
+            "heart" -> {
+              val active = !ann.userReactedHeart
+              ann.copy(
+                userReactedHeart = active,
+                heartCount = ann.heartCount + (if (active) 1 else -1)
+              )
+            }
             else -> ann
           }
         } else {
@@ -405,6 +523,111 @@ class PruconRepository {
         }
       }
     }
+  }
+
+  fun addCommentToAnnouncement(announcementId: String, content: String): Boolean {
+    if (content.isBlank()) return false
+    val current = _profile.value
+    val comment = PostComment(
+      id = "comment_${System.currentTimeMillis()}",
+      authorName = current.secretName,
+      authorRole = current.role,
+      content = content.trim(),
+      timestamp = "À l'instant",
+      likesCount = 0
+    )
+    _announcements.update { list ->
+      list.map { ann ->
+        if (ann.id == announcementId) {
+          ann.copy(comments = ann.comments + comment)
+        } else ann
+      }
+    }
+    awardXp(10)
+    return true
+  }
+
+  fun shareAnnouncement(announcementId: String) {
+    _announcements.update { list ->
+      list.map { ann ->
+        if (ann.id == announcementId) {
+          ann.copy(shareCount = ann.shareCount + 1)
+        } else ann
+      }
+    }
+    awardXp(15)
+  }
+
+  fun createStory(title: String, tag: String) {
+    val current = _profile.value
+    val newStory = UserStory(
+      id = "story_${System.currentTimeMillis()}",
+      authorName = current.secretName,
+      title = title,
+      tag = tag.ifBlank { "GAMING" },
+      isCreator = current.isCreator,
+      gradientStart = if (current.isCreator) 0xFFFFD700 else 0xFF00E676,
+      gradientEnd = if (current.isCreator) 0xFFFF9100 else 0xFF00B0FF,
+      timestamp = "À l'instant"
+    )
+    _stories.update { listOf(newStory) + it }
+    awardXp(30)
+  }
+
+  // --- Discord Messaging & Reactions ---
+
+  fun addChatMessageReaction(groupId: String, messageId: String, reaction: String) {
+    _chatMessages.update { map ->
+      val list = map[groupId] ?: emptyList()
+      val updatedList = list.map { msg ->
+        if (msg.id == messageId) {
+          val currentCount = msg.reactions[reaction] ?: 0
+          val updatedReactions = msg.reactions + (reaction to (currentCount + 1))
+          msg.copy(reactions = updatedReactions)
+        } else msg
+      }
+      map + (groupId to updatedList)
+    }
+  }
+
+  // --- Privacy & Anti-Data-Leak Controls ---
+
+  fun toggleHideEmail() {
+    _privacySettings.update {
+      it.copy(hideEmailFromPublic = !it.hideEmailFromPublic)
+    }
+  }
+
+  fun toggleHideSecretCode() {
+    _privacySettings.update {
+      it.copy(hideSecretCode = !it.hideSecretCode)
+    }
+  }
+
+  fun toggleE2EE() {
+    _privacySettings.update {
+      it.copy(e2eeChatActive = !it.e2eeChatActive)
+    }
+  }
+
+  fun updateExtendedProfile(
+    secretName: String,
+    title: String,
+    clan: String,
+    bio: String,
+    location: String,
+    coverTheme: String
+  ) {
+    val cur = _profile.value
+    val updated = cur.copy(
+      secretName = secretName.trim(),
+      title = title.trim(),
+      clan = clan.trim(),
+      bio = bio.trim(),
+      location = location.trim(),
+      coverTheme = coverTheme
+    )
+    updateCurrentProfile(updated)
   }
 
   fun registerTournament(tournamentId: String): Boolean {
@@ -532,5 +755,60 @@ class PruconRepository {
 
     val updated = current.copy(xp = newXp, level = newLevel, nextLevelXp = nextXp)
     updateCurrentProfile(updated)
+  }
+
+  // --- Live Stream Management ---
+  fun addLiveStream(title: String, platform: String, streamUrl: String, gameName: String) {
+    val cur = _profile.value
+    val newStream = LiveStream(
+      id = "live_${System.currentTimeMillis()}",
+      streamerName = cur.secretName,
+      streamerRole = cur.role,
+      title = title,
+      platform = platform,
+      streamUrl = streamUrl,
+      gameName = gameName,
+      viewerCount = 1,
+      isLive = true,
+      timestamp = "En direct",
+      authorId = cur.id
+    )
+    _liveStreams.update { listOf(newStream) + it }
+
+    // Also notify on the Facebook feed as an announcement
+    addAnnouncement(
+      title = "🔴 [LIVE STREAM] $title",
+      content = "Je suis en direct sur $platform pour jouer à $gameName ! Rejoignez mon live ici : $streamUrl",
+      tag = "Event"
+    )
+  }
+
+  fun stopLiveStream(streamId: String) {
+    _liveStreams.update { list -> list.filter { it.id != streamId } }
+  }
+
+  // --- About CGC Messages (Admin / Creator editable) ---
+  fun addAboutCgcMessage(title: String, content: String): Boolean {
+    val cur = _profile.value
+    if (!cur.canManageContent) return false
+
+    val newMessage = AboutCgcMessage(
+      id = "about_${System.currentTimeMillis()}",
+      title = title,
+      content = content,
+      authorName = cur.secretName,
+      authorRole = cur.role,
+      timestamp = "À l'instant",
+      isPinned = true
+    )
+    _aboutCgcMessages.update { listOf(newMessage) + it }
+    return true
+  }
+
+  fun deleteAboutCgcMessage(messageId: String): Boolean {
+    val cur = _profile.value
+    if (!cur.canManageContent) return false
+    _aboutCgcMessages.update { list -> list.filter { it.id != messageId } }
+    return true
   }
 }

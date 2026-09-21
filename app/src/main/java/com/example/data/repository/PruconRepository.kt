@@ -811,4 +811,632 @@ class PruconRepository {
     _aboutCgcMessages.update { list -> list.filter { it.id != messageId } }
     return true
   }
+
+  // =========================================================================
+  // ADVANCED ADMIN DASHBOARD MANAGEMENT
+  // =========================================================================
+
+  private val _managedUsers = MutableStateFlow<List<com.example.data.model.ManagedUser>>(
+    listOf(
+      com.example.data.model.ManagedUser(
+        id = "usr_creator",
+        username = "Zenil",
+        email = CREATOR_EMAIL,
+        role = "Super Admin",
+        status = com.example.data.model.UserAccountStatus.ACTIVE,
+        isVerified = true,
+        registrationDate = "01/09/2026",
+        lastLogin = "Aujourd'hui à 15:45",
+        lastActivity = "À l'instant",
+        warningsCount = 0,
+        reportsReceivedCount = 0,
+        reportsSentCount = 0,
+        messagesCount = 184,
+        roomsJoinedCount = 5,
+        ipAddress = "105.102.14.22 (Kinshasa)",
+        device = "MacBook Pro / Chrome • Kinshasa RDC"
+      ),
+      com.example.data.model.ManagedUser(
+        id = "usr_kabila_gaming",
+        username = "KinshasaSniper",
+        email = "sniper.kin@gmail.com",
+        role = "Modérateur",
+        status = com.example.data.model.UserAccountStatus.ACTIVE,
+        isVerified = true,
+        registrationDate = "04/09/2026",
+        lastLogin = "Aujourd'hui à 14:10",
+        lastActivity = "Il y a 12 min",
+        warningsCount = 0,
+        reportsReceivedCount = 0,
+        reportsSentCount = 4,
+        messagesCount = 92,
+        roomsJoinedCount = 3,
+        ipAddress = "197.242.128.84 (Gombe)",
+        device = "PlayStation 5 / App CGC"
+      ),
+      com.example.data.model.ManagedUser(
+        id = "usr_goma_pro",
+        username = "GomaStriker",
+        email = "goma.warrior@yahoo.fr",
+        role = "Joueur",
+        status = com.example.data.model.UserAccountStatus.ACTIVE,
+        isVerified = true,
+        registrationDate = "10/09/2026",
+        lastLogin = "Hier à 22:15",
+        lastActivity = "Il y a 1h",
+        warningsCount = 1,
+        reportsReceivedCount = 1,
+        reportsSentCount = 2,
+        messagesCount = 64,
+        roomsJoinedCount = 4,
+        ipAddress = "41.243.19.102 (Goma)",
+        device = "PC Windows / Discord Web"
+      ),
+      com.example.data.model.ManagedUser(
+        id = "usr_spammer_bot",
+        username = "FreeCoinsBot",
+        email = "bot992@tempmail.org",
+        role = "Joueur",
+        status = com.example.data.model.UserAccountStatus.MUTED,
+        isVerified = false,
+        registrationDate = "18/09/2026",
+        lastLogin = "Il y a 3h",
+        lastActivity = "Il y a 3h",
+        warningsCount = 3,
+        reportsReceivedCount = 6,
+        reportsSentCount = 0,
+        messagesCount = 28,
+        roomsJoinedCount = 2,
+        ipAddress = "185.220.101.5 (Proxy)",
+        device = "Inconnu / Headless Script"
+      )
+    )
+  )
+  val managedUsers: StateFlow<List<com.example.data.model.ManagedUser>> = _managedUsers.asStateFlow()
+
+  private val _platformReports = MutableStateFlow<List<com.example.data.model.PlatformReport>>(
+    listOf(
+      com.example.data.model.PlatformReport(
+        id = "rep_101",
+        category = com.example.data.model.ReportCategory.SPAM,
+        reportedTarget = "Message dans #général: 'Gagnez 500k crédits FC 25 gratuit sur bit.ly/...'",
+        reportedUser = "FreeCoinsBot",
+        reportingUser = "KinshasaSniper",
+        reason = "Lien suspect d'arnaque et phishing détecté dans le salon général",
+        priority = com.example.data.model.ReportPriority.HIGH,
+        status = com.example.data.model.ReportStatus.PENDING,
+        timestamp = "Il y a 15 min"
+      ),
+      com.example.data.model.PlatformReport(
+        id = "rep_102",
+        category = com.example.data.model.ReportCategory.HARASSMENT,
+        reportedTarget = "Salon vocal Tournoi 1v1",
+        reportedUser = "TrollKing243",
+        reportingUser = "GomaStriker",
+        reason = "Insultes répétées après une défaite en quart de finale",
+        priority = com.example.data.model.ReportPriority.MEDIUM,
+        status = com.example.data.model.ReportStatus.UNDER_REVIEW,
+        timestamp = "Il y a 1h",
+        assignedAdmin = "Zenil"
+      )
+    )
+  )
+  val platformReports: StateFlow<List<com.example.data.model.PlatformReport>> = _platformReports.asStateFlow()
+
+  private val _managedRooms = MutableStateFlow<List<com.example.data.model.ManagedRoom>>(
+    listOf(
+      com.example.data.model.ManagedRoom(
+        id = "room_gen",
+        name = "lobby-general",
+        category = "COMMUNAUTÉ",
+        description = "Discussion générale de tous les gamers de la CGC en RDC",
+        isLocked = false,
+        isPrivate = false,
+        memberCount = 142,
+        maxMembers = 500,
+        slowModeSeconds = 0,
+        allowMedia = true,
+        allowLinks = true
+      ),
+      com.example.data.model.ManagedRoom(
+        id = "room_fc25",
+        name = "fc25-competitions",
+        category = "TOURNOIS",
+        description = "Salon dédié aux compétitions EA SPORTS FC 25 et défis 1v1",
+        isLocked = false,
+        isPrivate = false,
+        memberCount = 88,
+        maxMembers = 250,
+        slowModeSeconds = 5,
+        allowMedia = true,
+        allowLinks = false
+      ),
+      com.example.data.model.ManagedRoom(
+        id = "room_vip",
+        name = "capitaines-de-clans",
+        category = "RESTREINT",
+        description = "Salon réservé aux capitaines de clans et staffs certifiés CGC",
+        isLocked = false,
+        isPrivate = true,
+        memberCount = 18,
+        maxMembers = 50,
+        slowModeSeconds = 0,
+        allowMedia = true,
+        allowLinks = true
+      )
+    )
+  )
+  val managedRooms: StateFlow<List<com.example.data.model.ManagedRoom>> = _managedRooms.asStateFlow()
+
+  private val _auditLogs = MutableStateFlow<List<com.example.data.model.AuditLogEntry>>(
+    listOf(
+      com.example.data.model.AuditLogEntry(
+        id = "log_01",
+        adminName = "Zenil",
+        adminRole = "Super Admin",
+        action = "MODERATION_MUTE",
+        target = "FreeCoinsBot",
+        details = "Mise en sourdine automatique pour détection de message de spam",
+        ipAddress = "105.102.14.22"
+      ),
+      com.example.data.model.AuditLogEntry(
+        id = "log_02",
+        adminName = "Zenil",
+        adminRole = "Super Admin",
+        action = "ROLE_ASSIGNMENT",
+        target = "KinshasaSniper",
+        details = "Nomination au rôle de Modérateur certifié",
+        ipAddress = "105.102.14.22"
+      ),
+      com.example.data.model.AuditLogEntry(
+        id = "log_03",
+        adminName = "Système CGC",
+        adminRole = "Automated Security Engine",
+        action = "SECURITY_BACKUP",
+        target = "PostgreSQL DB / Cluster",
+        details = "Sauvegarde instantanée chiffrée avec succès (Taille : 48.2 MB)",
+        ipAddress = "127.0.0.1"
+      )
+    )
+  )
+  val auditLogs: StateFlow<List<com.example.data.model.AuditLogEntry>> = _auditLogs.asStateFlow()
+
+  private val _securityAlerts = MutableStateFlow<List<com.example.data.model.SecurityAlert>>(
+    listOf(
+      com.example.data.model.SecurityAlert(
+        id = "sec_1",
+        title = "Tentative de connexion inhabituelle bloquée",
+        description = "IP 185.220.101.5 a tenté 5 connexions erronées sur l'UID admin. Blocage temporaire 1h.",
+        severity = "WARNING"
+      ),
+      com.example.data.model.SecurityAlert(
+        id = "sec_2",
+        title = "Chiffrement et intégrité base de données : 100% Vérifié",
+        description = "Audit d'intégrité automatique réussi. Aucun mot de passe exposé, aucune fuite d'UID.",
+        severity = "INFO"
+      )
+    )
+  )
+  val securityAlerts: StateFlow<List<com.example.data.model.SecurityAlert>> = _securityAlerts.asStateFlow()
+
+  private val _supportTickets = MutableStateFlow<List<com.example.data.model.SupportTicket>>(
+    listOf(
+      com.example.data.model.SupportTicket(
+        id = "tck_201",
+        subject = "Problème d'attribution des récompenses FC 25",
+        userName = "GomaStriker",
+        priority = "Moyenne",
+        status = "Ouvert",
+        timestamp = "Il y a 45 min",
+        internalNote = "Vérifier le tableau du tournoi du 15 Septembre"
+      ),
+      com.example.data.model.SupportTicket(
+        id = "tck_202",
+        subject = "Demande de vérification de badge de clan esport",
+        userName = "KinshasaSniper",
+        priority = "Basse",
+        status = "En cours",
+        timestamp = "Hier à 18:20",
+        internalNote = "Clan vérifié : Kinshasa Esports Federation"
+      )
+    )
+  )
+  val supportTickets: StateFlow<List<com.example.data.model.SupportTicket>> = _supportTickets.asStateFlow()
+
+  private val _apiKeys = MutableStateFlow<List<com.example.data.model.ApiKeyEntry>>(
+    listOf(
+      com.example.data.model.ApiKeyEntry(
+        id = "key_live_01",
+        name = "CGC Discord Webhook Relay",
+        prefix = "cgc_live_9f82...",
+        permissions = "messages.read, webhooks.post",
+        createdAt = "01/09/2026",
+        lastUsed = "Il y a 4 min",
+        isActive = true
+      ),
+      com.example.data.model.ApiKeyEntry(
+        id = "key_live_02",
+        name = "Tournaments Bracket Sync API",
+        prefix = "cgc_live_a441...",
+        permissions = "tournaments.manage",
+        createdAt = "10/09/2026",
+        lastUsed = "Hier à 21:00",
+        isActive = true
+      )
+    )
+  )
+  val apiKeys: StateFlow<List<com.example.data.model.ApiKeyEntry>> = _apiKeys.asStateFlow()
+
+  private val _systemMetrics = MutableStateFlow(com.example.data.model.SystemMetrics())
+  val systemMetrics: StateFlow<com.example.data.model.SystemMetrics> = _systemMetrics.asStateFlow()
+
+  // --- Admin Action Dispatchers ---
+
+  fun updateUserStatus(userId: String, newStatus: com.example.data.model.UserAccountStatus, reason: String = ""): Boolean {
+    val cur = _profile.value
+    if (!cur.isCreator && cur.role != UserRole.ADMIN && cur.role != UserRole.MODERATOR) return false
+
+    _managedUsers.update { list ->
+      list.map { user ->
+        if (user.id == userId) user.copy(status = newStatus) else user
+      }
+    }
+
+    addAuditLog(
+      action = "USER_STATUS_CHANGE ($newStatus)",
+      target = userId,
+      details = "Statut utilisateur modifié vers $newStatus. Motif : $reason"
+    )
+    return true
+  }
+
+  fun warnUser(userId: String, reason: String): Boolean {
+    _managedUsers.update { list ->
+      list.map { user ->
+        if (user.id == userId) user.copy(warningsCount = user.warningsCount + 1) else user
+      }
+    }
+    addAuditLog("USER_WARN", userId, "Avertissement adressé. Motif : $reason")
+    return true
+  }
+
+  fun resolveReport(reportId: String, resolution: com.example.data.model.ReportStatus, adminNote: String): Boolean {
+    _platformReports.update { list ->
+      list.map { rep ->
+        if (rep.id == reportId) rep.copy(status = resolution, internalNote = adminNote, assignedAdmin = _profile.value.secretName)
+        else rep
+      }
+    }
+    addAuditLog("REPORT_RESOLUTION", reportId, "Signalement passé au statut : $resolution. Note : $adminNote")
+    return true
+  }
+
+  fun toggleLockRoom(roomId: String): Boolean {
+    _managedRooms.update { list ->
+      list.map { room ->
+        if (room.id == roomId) {
+          val next = !room.isLocked
+          addAuditLog(if (next) "ROOM_LOCKED" else "ROOM_UNLOCKED", room.name, "Verrouillage du salon")
+          room.copy(isLocked = next)
+        } else room
+      }
+    }
+    return true
+  }
+
+  fun createManagedRoom(name: String, category: String, desc: String, isPrivate: Boolean): Boolean {
+    val newRoom = com.example.data.model.ManagedRoom(
+      id = "room_${System.currentTimeMillis()}",
+      name = name.lowercase().replace(" ", "-"),
+      category = category.uppercase(),
+      description = desc,
+      isPrivate = isPrivate
+    )
+    _managedRooms.update { listOf(newRoom) + it }
+    addAuditLog("ROOM_CREATED", newRoom.name, "Création d'un nouveau salon administré")
+    return true
+  }
+
+  fun updateTicketStatus(ticketId: String, newStatus: String, note: String = ""): Boolean {
+    _supportTickets.update { list ->
+      list.map { t ->
+        if (t.id == ticketId) t.copy(status = newStatus, internalNote = note.ifBlank { t.internalNote })
+        else t
+      }
+    }
+    addAuditLog("TICKET_UPDATED", ticketId, "Ticket d'assistance passé à : $newStatus")
+    return true
+  }
+
+  fun triggerManualBackup(): String {
+    val backupId = "CGC_BACKUP_${System.currentTimeMillis()}"
+    addAuditLog("DATABASE_BACKUP", backupId, "Sauvegarde complète manuelle déclenchée par l'administrateur (Taille estimée : 52.4 MB)")
+    return backupId
+  }
+
+  // =========================================================================
+  // USER FREEDOM, COMFORT AND SAFETY SYSTEM
+  // =========================================================================
+
+  private val _userPrivacySettings = MutableStateFlow(com.example.data.model.UserPrivacyCenterSettings())
+  val userPrivacySettings: StateFlow<com.example.data.model.UserPrivacyCenterSettings> = _userPrivacySettings.asStateFlow()
+
+  private val _userCommunicationControls = MutableStateFlow(com.example.data.model.UserCommunicationControls())
+  val userCommunicationControls: StateFlow<com.example.data.model.UserCommunicationControls> = _userCommunicationControls.asStateFlow()
+
+  private val _blockedUsers = MutableStateFlow<List<com.example.data.model.BlockedUserItem>>(
+    listOf(
+      com.example.data.model.BlockedUserItem(
+        id = "usr_spammer_bot",
+        username = "FreeCoinsBot",
+        blockedAt = "Hier à 16:30",
+        reason = "Messages de spam répétitifs et liens suspects"
+      )
+    )
+  )
+  val blockedUsers: StateFlow<List<com.example.data.model.BlockedUserItem>> = _blockedUsers.asStateFlow()
+
+  private val _mutedUsers = MutableStateFlow<List<com.example.data.model.MutedUserItem>>(
+    listOf(
+      com.example.data.model.MutedUserItem(
+        id = "usr_toxic_player",
+        username = "TrollKing243",
+        mutedAt = "Aujourd'hui à 11:15",
+        duration = com.example.data.model.MuteDuration.ONE_DAY
+      )
+    )
+  )
+  val mutedUsers: StateFlow<List<com.example.data.model.MutedUserItem>> = _mutedUsers.asStateFlow()
+
+  private val _submittedReports = MutableStateFlow<List<com.example.data.model.UserSubmittedReport>>(
+    listOf(
+      com.example.data.model.UserSubmittedReport(
+        id = "rep_user_01",
+        category = com.example.data.model.SafetyReportCategory.SPAM,
+        targetType = "Message",
+        targetIdentifier = "#général-rdc (FreeCoinsBot)",
+        reason = "Lien suspect d'arnaque de crédits",
+        evidenceNote = "Message contenant lien phishing bit.ly/fc25-free-coins",
+        isAnonymous = true,
+        status = "Résolu - Mesures prises",
+        submittedAt = "Hier à 16:35",
+        adminFeedback = "L'utilisateur a été mis en sourdine et les messages nettoyés. Merci pour votre vigilance !"
+      )
+    )
+  )
+  val submittedReports: StateFlow<List<com.example.data.model.UserSubmittedReport>> = _submittedReports.asStateFlow()
+
+  private val _activeSessions = MutableStateFlow<List<com.example.data.model.UserActiveSession>>(
+    listOf(
+      com.example.data.model.UserActiveSession(
+        id = "sess_current",
+        device = "Android App CGC (Cet appareil)",
+        browserOrApp = "Application Native Kotlin",
+        approximateLocation = "Kinshasa, Gombe • RDC",
+        ipAddress = "105.102.14.*** (Protégé)",
+        lastActivity = "Actif à l'instant",
+        isCurrent = true,
+        loginDate = "Aujourd'hui à 14:20"
+      ),
+      com.example.data.model.UserActiveSession(
+        id = "sess_mac",
+        device = "MacBook Pro / Chrome Web",
+        browserOrApp = "Chrome 128 / macOS",
+        approximateLocation = "Kinshasa, Lingwala • RDC",
+        ipAddress = "197.242.128.*** (Protégé)",
+        lastActivity = "Il y a 3 heures",
+        isCurrent = false,
+        loginDate = "Hier à 20:15"
+      ),
+      com.example.data.model.UserActiveSession(
+        id = "sess_ps5",
+        device = "PlayStation 5 Console",
+        browserOrApp = "PlayStation Network Client",
+        approximateLocation = "Kinshasa, RDC",
+        ipAddress = "41.243.19.*** (Protégé)",
+        lastActivity = "Il y a 2 jours",
+        isCurrent = false,
+        loginDate = "18/09/2026"
+      )
+    )
+  )
+  val activeSessions: StateFlow<List<com.example.data.model.UserActiveSession>> = _activeSessions.asStateFlow()
+
+  private val _emergencyShield = MutableStateFlow(com.example.data.model.EmergencySafetyShieldState())
+  val emergencyShield: StateFlow<com.example.data.model.EmergencySafetyShieldState> = _emergencyShield.asStateFlow()
+
+  private val _twoFactorEnabled = MutableStateFlow(true)
+  val twoFactorEnabled: StateFlow<Boolean> = _twoFactorEnabled.asStateFlow()
+
+  private val _userAppeals = MutableStateFlow<List<com.example.data.model.UserAppeal>>(emptyList())
+  val userAppeals: StateFlow<List<com.example.data.model.UserAppeal>> = _userAppeals.asStateFlow()
+
+  private val _personalizationPreferences = MutableStateFlow(com.example.data.model.PersonalizationPreferences())
+  val personalizationPreferences: StateFlow<com.example.data.model.PersonalizationPreferences> = _personalizationPreferences.asStateFlow()
+
+  fun updatePrivacySettings(newSettings: com.example.data.model.UserPrivacyCenterSettings) {
+    _userPrivacySettings.value = newSettings
+  }
+
+  fun updateCommunicationControls(newControls: com.example.data.model.UserCommunicationControls) {
+    _userCommunicationControls.value = newControls
+  }
+
+  fun blockUser(userId: String, username: String, reason: String = "Bloqué par l'utilisateur"): Boolean {
+    if (_blockedUsers.value.any { it.id == userId }) return false
+    val item = com.example.data.model.BlockedUserItem(
+      id = userId,
+      username = username,
+      reason = reason
+    )
+    _blockedUsers.update { listOf(item) + it }
+    return true
+  }
+
+  fun unblockUser(userId: String): Boolean {
+    val before = _blockedUsers.value.size
+    _blockedUsers.update { list -> list.filter { it.id != userId } }
+    return _blockedUsers.value.size < before
+  }
+
+  fun muteUser(userId: String, username: String, duration: com.example.data.model.MuteDuration): Boolean {
+    _mutedUsers.update { list ->
+      list.filter { it.id != userId } + com.example.data.model.MutedUserItem(
+        id = userId,
+        username = username,
+        duration = duration
+      )
+    }
+    return true
+  }
+
+  fun unmuteUser(userId: String): Boolean {
+    val before = _mutedUsers.value.size
+    _mutedUsers.update { list -> list.filter { it.id != userId } }
+    return _mutedUsers.value.size < before
+  }
+
+  fun submitUserReport(
+    category: com.example.data.model.SafetyReportCategory,
+    targetType: String,
+    targetIdentifier: String,
+    reason: String,
+    evidenceNote: String = "",
+    isAnonymous: Boolean = true
+  ): String {
+    val reportId = "rep_${System.currentTimeMillis().toString().takeLast(6)}"
+    val report = com.example.data.model.UserSubmittedReport(
+      id = reportId,
+      category = category,
+      targetType = targetType,
+      targetIdentifier = targetIdentifier,
+      reason = reason,
+      evidenceNote = evidenceNote,
+      isAnonymous = isAnonymous
+    )
+    _submittedReports.update { listOf(report) + it }
+
+    // Also link into Platform Reports for Admins
+    _platformReports.update { list ->
+      listOf(
+        com.example.data.model.PlatformReport(
+          id = reportId,
+          category = when (category) {
+            com.example.data.model.SafetyReportCategory.SPAM -> com.example.data.model.ReportCategory.SPAM
+            com.example.data.model.SafetyReportCategory.HARASSMENT -> com.example.data.model.ReportCategory.HARASSMENT
+            com.example.data.model.SafetyReportCategory.SCAM -> com.example.data.model.ReportCategory.SCAM
+            com.example.data.model.SafetyReportCategory.IMPERSONATION -> com.example.data.model.ReportCategory.IMPERSONATION
+            com.example.data.model.SafetyReportCategory.THREAT -> com.example.data.model.ReportCategory.THREATS
+            com.example.data.model.SafetyReportCategory.HATE_OR_ABUSE -> com.example.data.model.ReportCategory.HATE_SPEECH
+            com.example.data.model.SafetyReportCategory.ILLEGAL_CONTENT -> com.example.data.model.ReportCategory.ILLEGAL_CONTENT
+            else -> com.example.data.model.ReportCategory.OTHER
+          },
+          reportedTarget = "$targetType : $targetIdentifier",
+          reportedUser = targetIdentifier,
+          reportingUser = if (isAnonymous) "Utilisateur Anonyme Protégé" else _profile.value.secretName,
+          reason = reason,
+          priority = if (category == com.example.data.model.SafetyReportCategory.THREAT || category == com.example.data.model.SafetyReportCategory.ILLEGAL_CONTENT) {
+            com.example.data.model.ReportPriority.CRITICAL
+          } else {
+            com.example.data.model.ReportPriority.MEDIUM
+          }
+        )
+      ) + list
+    }
+
+    return reportId
+  }
+
+  fun toggleEmergencyShield(enable: Boolean) {
+    _emergencyShield.update { current ->
+      if (enable) {
+        current.copy(
+          isActive = true,
+          activatedAt = java.text.SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault()).format(java.util.Date())
+        )
+      } else {
+        current.copy(isActive = false, activatedAt = null)
+      }
+    }
+  }
+
+  fun terminateSession(sessionId: String) {
+    _activeSessions.update { list -> list.filter { it.id != sessionId } }
+  }
+
+  fun terminateAllOtherSessions() {
+    _activeSessions.update { list -> list.filter { it.isCurrent } }
+  }
+
+  fun toggleTwoFactor(): Boolean {
+    _twoFactorEnabled.update { !it }
+    return _twoFactorEnabled.value
+  }
+
+  fun submitAppeal(sanctionType: String, explanation: String): String {
+    val appealId = "apl_${System.currentTimeMillis().toString().takeLast(5)}"
+    val appeal = com.example.data.model.UserAppeal(
+      id = appealId,
+      sanctionType = sanctionType,
+      explanation = explanation
+    )
+    _userAppeals.update { listOf(appeal) + it }
+    return appealId
+  }
+
+  fun exportUserDataJson(): String {
+    val prof = _profile.value
+    val priv = _userPrivacySettings.value
+    val comm = _userCommunicationControls.value
+    return """
+    {
+      "export_version": "1.0",
+      "platform": "CGC - Communauté Gaming Congolaise",
+      "export_date": "${java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())}",
+      "user_profile": {
+        "id": "${prof.id}",
+        "username": "${prof.secretName}",
+        "email": "${prof.email}",
+        "member_since": "${prof.memberSince}",
+        "role": "${prof.role.label}",
+        "level": ${prof.level},
+        "xp": ${prof.xp},
+        "clan": "${prof.clan}",
+        "platform": "${prof.favoritePlatform}"
+      },
+      "privacy_settings": {
+        "profile_visibility": "${priv.profileVisibility.label}",
+        "online_status": "${priv.onlineStatus.label}",
+        "last_seen": "${priv.lastSeen.label}",
+        "read_receipts": ${priv.readReceiptsEnabled},
+        "typing_indicators": ${priv.typingIndicatorEnabled},
+        "hide_email": ${priv.hideEmail},
+        "hide_location": ${priv.hideExactLocation}
+      },
+      "communication_controls": {
+        "who_can_message": "${comm.whoCanMessageMe.label}",
+        "who_can_add_to_rooms": "${comm.whoCanAddMeToRooms.label}",
+        "who_can_call": "${comm.whoCanCallMe.label}",
+        "who_can_mention": "${comm.whoCanMentionMe.label}"
+      },
+      "blocked_users_count": ${_blockedUsers.value.size},
+      "muted_users_count": ${_mutedUsers.value.size},
+      "data_retention_policy": "Vos données vous appartiennent. Aucune revente commerciale, chiffrement E2EE garanti."
+    }
+    """.trimIndent()
+  }
+
+  fun addAuditLog(action: String, target: String, details: String) {
+    val cur = _profile.value
+    val newEntry = com.example.data.model.AuditLogEntry(
+      id = "log_${System.currentTimeMillis()}",
+      adminName = cur.secretName,
+      adminRole = cur.role.label,
+      action = action,
+      target = target,
+      details = details,
+      ipAddress = "105.102.14.22"
+    )
+    _auditLogs.update { listOf(newEntry) + it }
+  }
 }

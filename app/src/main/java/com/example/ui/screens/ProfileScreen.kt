@@ -118,6 +118,8 @@ fun ProfileScreen(
   onAddAnnouncement: (title: String, content: String, tag: String) -> Unit = { _, _, _ -> },
   onDeletePost: (String) -> Unit = {},
   onOpenCreatorConsole: () -> Unit = {},
+  onOpenAdminDashboard: () -> Unit = {},
+  onOpenSafetyDashboard: () -> Unit = {},
   onOpenAuth: () -> Unit = {},
   modifier: Modifier = Modifier
 ) {
@@ -429,7 +431,15 @@ fun ProfileScreen(
           }
 
           // 3. Espace Administration ou Switcher
-          if (profile.isCreator) {
+          if (profile.isCreator || profile.role == com.example.data.model.UserRole.ADMIN) {
+            Button(
+              onClick = onOpenAdminDashboard,
+              colors = ButtonDefaults.buttonColors(containerColor = CyanNeon, contentColor = CyberBlack),
+              shape = RoundedCornerShape(8.dp),
+              modifier = Modifier.weight(1.1f)
+            ) {
+              Text("Admin 🛡️", fontSize = 11.sp, fontWeight = FontWeight.Black)
+            }
             Button(
               onClick = onOpenCreatorConsole,
               colors = ButtonDefaults.buttonColors(containerColor = GoldNeon, contentColor = CyberBlack),
@@ -973,6 +983,31 @@ fun ProfileScreen(
                     onCheckedChange = { onToggleHideEmail() },
                     colors = SwitchDefaults.colors(checkedThumbColor = EmeraldNeon, checkedTrackColor = EmeraldGlow.copy(alpha = 0.3f))
                   )
+                }
+
+                HorizontalDivider(color = CyberCardBorder)
+
+                // Button to open complete User Freedom, Comfort & Safety Dashboard
+                Button(
+                  onClick = onOpenSafetyDashboard,
+                  modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("open_safety_dashboard_from_profile_button"),
+                  colors = ButtonDefaults.buttonColors(containerColor = EmeraldNeon),
+                  shape = RoundedCornerShape(8.dp)
+                ) {
+                  Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                  ) {
+                    Icon(Icons.Default.Shield, contentDescription = null, tint = CyberBlack, modifier = Modifier.size(18.dp))
+                    Text(
+                      "Centre de Liberté, Confort & Sécurité Complet",
+                      color = CyberBlack,
+                      fontWeight = FontWeight.Bold,
+                      fontSize = 12.sp
+                    )
+                  }
                 }
               }
             }

@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.data.model.GamerProfile
+import com.example.data.model.UserRole
 import com.example.data.repository.PruconRepository
 import com.example.ui.theme.CyberBlack
 import com.example.ui.theme.CyberCard
@@ -62,6 +63,8 @@ fun PruconHeader(
   modifier: Modifier = Modifier,
   onProfileClick: () -> Unit = {},
   onCreatorConsoleClick: () -> Unit = {},
+  onAdminDashboardClick: () -> Unit = {},
+  onSafetyDashboardClick: () -> Unit = {},
   onAuthClick: () -> Unit = {},
   onMenuClick: () -> Unit = {}
 ) {
@@ -233,8 +236,29 @@ fun PruconHeader(
         }
 
         Row(verticalAlignment = Alignment.CenterVertically) {
-          // If Creator, show direct Console button
-          if (profile.isCreator) {
+          // If Creator or Admin, show direct Admin Control Center button
+          if (profile.isCreator || profile.role == UserRole.ADMIN) {
+            Surface(
+              onClick = onAdminDashboardClick,
+              shape = RoundedCornerShape(16.dp),
+              color = CyanNeon.copy(alpha = 0.2f),
+              border = androidx.compose.foundation.BorderStroke(1.dp, CyanNeon),
+              modifier = Modifier.testTag("admin_dashboard_header_button")
+            ) {
+              Row(
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically
+              ) {
+                Text(
+                  text = "🛡️ ADMIN",
+                  color = CyanGlow,
+                  fontSize = 10.sp,
+                  fontWeight = FontWeight.Black
+                )
+              }
+            }
+            Spacer(modifier = Modifier.width(6.dp))
+
             Surface(
               onClick = onCreatorConsoleClick,
               shape = RoundedCornerShape(16.dp),
@@ -247,7 +271,7 @@ fun PruconHeader(
                 verticalAlignment = Alignment.CenterVertically
               ) {
                 Text(
-                  text = "👑 GÉRER",
+                  text = "👑 CONSOLE",
                   color = GoldNeon,
                   fontSize = 10.sp,
                   fontWeight = FontWeight.Black
@@ -295,6 +319,29 @@ fun PruconHeader(
                 color = GoldNeon,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.Bold
+              )
+            }
+          }
+
+          Spacer(modifier = Modifier.width(6.dp))
+
+          // Quick Freedom, Comfort & Safety Center button
+          Surface(
+            onClick = onSafetyDashboardClick,
+            shape = RoundedCornerShape(20.dp),
+            color = EmeraldNeon.copy(alpha = 0.15f),
+            border = androidx.compose.foundation.BorderStroke(1.dp, EmeraldNeon),
+            modifier = Modifier.testTag("header_safety_button")
+          ) {
+            Row(
+              modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+              verticalAlignment = Alignment.CenterVertically
+            ) {
+              Text(
+                text = "🛡️ SÉCURITÉ",
+                color = EmeraldNeon,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Black
               )
             }
           }

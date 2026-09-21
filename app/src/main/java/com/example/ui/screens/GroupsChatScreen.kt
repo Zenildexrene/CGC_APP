@@ -39,6 +39,9 @@ import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.VolumeUp
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
@@ -50,6 +53,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -100,6 +104,9 @@ fun GroupsChatScreen(
   discordChannels: List<DiscordChannel> = emptyList(),
   allUsers: List<GamerProfile> = emptyList(),
   currentProfile: GamerProfile? = null,
+  blockedUsernames: Set<String> = emptySet(),
+  onQuickBlockUser: (username: String) -> Unit = {},
+  onQuickReportMessage: (senderName: String, content: String, category: String) -> Unit = { _, _, _ -> },
   onSendMessage: (groupId: String, content: String) -> Unit,
   onRollDice: (groupId: String) -> Int,
   onJoinGroup: (groupId: String) -> Unit,
@@ -124,6 +131,7 @@ fun GroupsChatScreen(
   var showMembersListModal by remember { mutableStateOf(false) }
   var isMicMuted by remember { mutableStateOf(false) }
   var isHeadsetDeafened by remember { mutableStateOf(false) }
+  var quickSafetyMessage by remember { mutableStateOf<ChatMessage?>(null) }
 
   val activeChannel = channels.find { it.id == activeChannelId } ?: channels.first()
   val messages = chatMessages[activeChannelId] ?: emptyList()
@@ -601,11 +609,20 @@ fun GroupsChatScreen(
         }
 
         // Messages list
-        items(messages, key = { it.id }) { msg ->
+        val visibleMessages = messages.filter { msg ->
+          !blockedUsernames.contains(msg.senderName.lowercase().trim())
+        }
+
+        items(visibleMessages, key = { it.id }) { msg ->
+          val isOwn = currentProfile?.secretName?.equals(msg.senderName, ignoreCase = true) == true
           DiscordMessageRow(
             message = msg,
+            isOwnMessage = isOwn,
             onAddReaction = { reaction ->
               onAddReaction(activeChannelId, msg.id, reaction)
+            },
+            onSafetyClick = {
+              quickSafetyMessage = msg
             }
           )
         }
@@ -791,6 +808,143 @@ fun GroupsChatScreen(
       }
     }
   }
+
+  // ---------------------------------------------------------
+  // Quick Safety Dialog (2-click block, 3-click report)
+  // ---------------------------------------------------------
+  if (quickSafetyMessage != null) {
+    val targetMsg = quickSafetyMessage!!
+    var reportStep by remember { mutableStateOf(false) }
+    var selectedCategory by remember { mutableStateOf("harassment") }
+    var actionDoneMessage by remember { mutableStateOf<String?>(null) }
+
+    AlertDialog(
+      onDismissRequest = { quickSafetyMessage = null },
+      containerColor = DarkSurface,
+      title = {
+        Row(
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+          Icon(
+            imageVector = Icons.Default.Security,
+            contentDescription = null,
+            tint = EmeraldNeon,
+            modifier = Modifier.size(20.dp)
+          )
+          Text(
+            if (!reportStep) "Protection & Sécurité" else "Signaler un message",
+            color = TextPrimary,
+            fontWeight = FontWeight.Bold,
+            fontSize = 15.sp
+          )
+        }
+      },
+      text = {
+        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+          if (actionDoneMessage != null) {
+            Text(actionDoneMessage!!, color = EmeraldGlow, fontWeight = FontWeight.Bold, fontSize = 13.sp)
+          } else if (!reportStep) {
+            Text("Message de @${targetMsg.senderName} :", color = TextSecondary, fontSize = 12.sp)
+            Surface(
+              color = CyberBlack,
+              shape = RoundedCornerShape(8.dp),
+              border = androidx.compose.foundation.BorderStroke(1.dp, CyberCardBorder),
+              modifier = Modifier.fillMaxWidth()
+            ) {
+              Text(
+                text = "\"${targetMsg.content.take(120)}\"",
+                color = TextPrimary,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(10.dp)
+              )
+            }
+
+            Text(
+              "Agissez en toute liberté : bloquez les messages indésirables en 2 clics ou signalez anonymement.",
+              color = TextMuted,
+              fontSize = 11.sp
+            )
+
+            // Button 1: Quick Block (2 clicks total)
+            Button(
+              onClick = {
+                onQuickBlockUser(targetMsg.senderName)
+                actionDoneMessage = "Utilisateur @${targetMsg.senderName} bloqué avec succès. Ses messages sont désormais masqués."
+              },
+              colors = ButtonDefaults.buttonColors(containerColor = CyberBlack),
+              border = androidx.compose.foundation.BorderStroke(1.dp, PinkNeon),
+              modifier = Modifier.fillMaxWidth()
+            ) {
+              Text("🛡️ Bloquer @${targetMsg.senderName} (2 clics)", color = PinkNeon, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+            }
+
+            // Button 2: Report Message
+            Button(
+              onClick = { reportStep = true },
+              colors = ButtonDefaults.buttonColors(containerColor = CyberBlack),
+              border = androidx.compose.foundation.BorderStroke(1.dp, GoldNeon),
+              modifier = Modifier.fillMaxWidth()
+            ) {
+              Text("⚠️ Signaler ce message", color = GoldNeon, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+            }
+          } else {
+            Text("Motif du signalement (100% anonyme & garanti sans fuite) :", color = TextSecondary, fontSize = 12.sp)
+            val categories = listOf(
+              "harassment" to "Harcèlement ou intimidation",
+              "hate_speech" to "Discours de haine ou discrimination",
+              "spam" to "Spam ou publicité abusive",
+              "scam" to "Arnaque financière / Scam",
+              "illegal_content" to "Contenu illégal ou dangereux"
+            )
+            categories.forEach { (catId, label) ->
+              val isSel = selectedCategory == catId
+              Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = if (isSel) CyanNeon.copy(alpha = 0.15f) else CyberBlack,
+                border = androidx.compose.foundation.BorderStroke(1.dp, if (isSel) CyanNeon else CyberCardBorder),
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .clickable { selectedCategory = catId }
+              ) {
+                Text(
+                  text = label,
+                  color = if (isSel) CyanGlow else TextPrimary,
+                  fontSize = 12.sp,
+                  fontWeight = if (isSel) FontWeight.Bold else FontWeight.Normal,
+                  modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
+                )
+              }
+            }
+          }
+        }
+      },
+      confirmButton = {
+        if (actionDoneMessage != null) {
+          TextButton(onClick = { quickSafetyMessage = null }) {
+            Text("Fermer", color = EmeraldNeon, fontWeight = FontWeight.Bold)
+          }
+        } else if (reportStep) {
+          Button(
+            onClick = {
+              onQuickReportMessage(targetMsg.senderName, targetMsg.content, selectedCategory)
+              actionDoneMessage = "Merci. Votre signalement a été transmis à l'équipe de modération dans le respect de votre vie privée."
+            },
+            colors = ButtonDefaults.buttonColors(containerColor = EmeraldNeon)
+          ) {
+            Text("Envoyer le signalement (Étape 3/3)", color = CyberBlack, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+          }
+        }
+      },
+      dismissButton = {
+        if (actionDoneMessage == null) {
+          TextButton(onClick = { quickSafetyMessage = null }) {
+            Text("Annuler", color = TextSecondary)
+          }
+        }
+      }
+    )
+  }
 }
 
 // -------------------------------------------------------------
@@ -799,7 +953,9 @@ fun GroupsChatScreen(
 @Composable
 fun DiscordMessageRow(
   message: ChatMessage,
-  onAddReaction: (String) -> Unit
+  isOwnMessage: Boolean = false,
+  onAddReaction: (String) -> Unit,
+  onSafetyClick: () -> Unit = {}
 ) {
   val isCreator = message.senderName.contains("Zenil", ignoreCase = true) || message.senderRole == UserRole.CREATOR
   val authorColor = when {
@@ -833,10 +989,11 @@ fun DiscordMessageRow(
     }
 
     Column(modifier = Modifier.weight(1f)) {
-      // Header: Username + Role pill + Timestamp
+      // Header: Username + Role pill + Timestamp + Safety Shield for other users
       Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(6.dp)
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier.fillMaxWidth()
       ) {
         Text(
           text = message.senderName,
@@ -865,6 +1022,19 @@ fun DiscordMessageRow(
           color = TextMuted,
           fontSize = 10.sp
         )
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        if (!isOwnMessage) {
+          Icon(
+            imageVector = Icons.Default.Security,
+            contentDescription = "Options de protection et sécurité",
+            tint = TextMuted.copy(alpha = 0.6f),
+            modifier = Modifier
+              .size(16.dp)
+              .clickable { onSafetyClick() }
+          )
+        }
       }
 
       Spacer(modifier = Modifier.height(2.dp))

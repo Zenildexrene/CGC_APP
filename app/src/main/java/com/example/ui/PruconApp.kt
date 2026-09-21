@@ -79,6 +79,8 @@ fun PruconApp(
 ) {
   var selectedTab by remember { mutableStateOf(PruconTab.TIMELINE) }
   var showCreatorConsole by remember { mutableStateOf(false) }
+  var showAdminDashboard by remember { mutableStateOf(false) }
+  var showSafetyDashboard by remember { mutableStateOf(false) }
   var showAuthDialog by remember { mutableStateOf(false) }
   var showMenuDialog by remember { mutableStateOf(false) }
 
@@ -95,6 +97,26 @@ fun PruconApp(
   val liveStreams by repository.liveStreams.collectAsState()
   val aboutCgcMessages by repository.aboutCgcMessages.collectAsState()
 
+  val managedUsers by repository.managedUsers.collectAsState()
+  val platformReports by repository.platformReports.collectAsState()
+  val managedRooms by repository.managedRooms.collectAsState()
+  val auditLogs by repository.auditLogs.collectAsState()
+  val securityAlerts by repository.securityAlerts.collectAsState()
+  val supportTickets by repository.supportTickets.collectAsState()
+  val apiKeys by repository.apiKeys.collectAsState()
+  val systemMetrics by repository.systemMetrics.collectAsState()
+
+  // User Freedom, Comfort and Safety states
+  val userPrivacySettings by repository.userPrivacySettings.collectAsState()
+  val userCommunicationControls by repository.userCommunicationControls.collectAsState()
+  val blockedUsers by repository.blockedUsers.collectAsState()
+  val mutedUsers by repository.mutedUsers.collectAsState()
+  val submittedReports by repository.submittedReports.collectAsState()
+  val activeSessions by repository.activeSessions.collectAsState()
+  val emergencyShield by repository.emergencyShield.collectAsState()
+  val twoFactorEnabled by repository.twoFactorEnabled.collectAsState()
+  val userAppeals by repository.userAppeals.collectAsState()
+
   Scaffold(
     modifier = modifier.fillMaxSize(),
     containerColor = CyberBlack,
@@ -103,6 +125,8 @@ fun PruconApp(
         profile = profile,
         onProfileClick = { selectedTab = PruconTab.PROFILE },
         onCreatorConsoleClick = { showCreatorConsole = true },
+        onAdminDashboardClick = { showAdminDashboard = true },
+        onSafetyDashboardClick = { showSafetyDashboard = true },
         onAuthClick = { showAuthDialog = true },
         onMenuClick = { showMenuDialog = true }
       )
@@ -195,12 +219,34 @@ fun PruconApp(
           )
         }
         PruconTab.GROUPS -> {
+          val blockedNames = blockedUsers.map { it.username.lowercase().trim() }.toSet()
           GroupsChatScreen(
             groups = groups,
             chatMessages = chatMessages,
             discordChannels = discordChannels,
             allUsers = allUsers,
             currentProfile = profile,
+            blockedUsernames = blockedNames,
+            onQuickBlockUser = { username ->
+              repository.blockUser(username, username, "Bloqué depuis le chat communautaire")
+            },
+            onQuickReportMessage = { senderName, content, category ->
+              val cat = when (category) {
+                "harassment" -> com.example.data.model.SafetyReportCategory.HARASSMENT
+                "hate_speech" -> com.example.data.model.SafetyReportCategory.HATE_OR_ABUSE
+                "spam" -> com.example.data.model.SafetyReportCategory.SPAM
+                "scam" -> com.example.data.model.SafetyReportCategory.SCAM
+                "illegal_content" -> com.example.data.model.SafetyReportCategory.ILLEGAL_CONTENT
+                else -> com.example.data.model.SafetyReportCategory.OTHER
+              }
+              repository.submitUserReport(
+                category = cat,
+                targetType = "MESSAGE",
+                targetIdentifier = senderName,
+                reason = "Signalement Discord : $content",
+                isAnonymous = true
+              )
+            },
             onSendMessage = { groupId, content ->
               repository.sendMessage(groupId, content)
             },
@@ -242,6 +288,8 @@ fun PruconApp(
               repository.deleteMyPost(postId)
             },
             onOpenCreatorConsole = { showCreatorConsole = true },
+            onOpenAdminDashboard = { showAdminDashboard = true },
+            onOpenSafetyDashboard = { showSafetyDashboard = true },
             onOpenAuth = { showAuthDialog = true }
           )
         }
@@ -304,6 +352,14 @@ fun PruconApp(
         showMenuDialog = false
         showCreatorConsole = true
       },
+      onAdminDashboardClick = {
+        showMenuDialog = false
+        showAdminDashboard = true
+      },
+      onSafetyDashboardClick = {
+        showMenuDialog = false
+        showSafetyDashboard = true
+      },
       onAuthClick = {
         showMenuDialog = false
         showAuthDialog = true
@@ -313,6 +369,61 @@ fun PruconApp(
       onToggleE2EE = { repository.toggleE2EE() },
       onAddAboutMessage = { title, content -> repository.addAboutCgcMessage(title, content) },
       onDeleteAboutMessage = { id -> repository.deleteAboutCgcMessage(id) }
+    )
+  }
+
+  // Advanced Admin Dashboard (Comprehensive Control Center)
+  if (showAdminDashboard) {
+    com.example.ui.components.AdvancedAdminDashboardDialog(
+      currentProfile = profile,
+      managedUsers = managedUsers,
+      reports = platformReports,
+      rooms = managedRooms,
+      auditLogs = auditLogs,
+      securityAlerts = securityAlerts,
+      tickets = supportTickets,
+      apiKeys = apiKeys,
+      metrics = systemMetrics,
+      onUpdateUserStatus = { userId, status, reason -> repository.updateUserStatus(userId, status, reason) },
+      onWarnUser = { userId, reason -> repository.warnUser(userId, reason) },
+      onResolveReport = { reportId, status, note -> repository.resolveReport(reportId, status, note) },
+      onToggleLockRoom = { roomId -> repository.toggleLockRoom(roomId) },
+      onCreateRoom = { name, cat, desc, isPriv -> repository.createManagedRoom(name, cat, desc, isPriv) },
+      onUpdateTicketStatus = { ticketId, status, note -> repository.updateTicketStatus(ticketId, status, note) },
+      onTriggerBackup = { repository.triggerManualBackup() },
+      onDismiss = { showAdminDashboard = false }
+    )
+  }
+
+  // User Freedom, Comfort and Safety System (Privacy Center & Personal Security)
+  if (showSafetyDashboard) {
+    com.example.ui.components.UserSafetyDashboardDialog(
+      currentProfile = profile,
+      privacySettings = userPrivacySettings,
+      communicationControls = userCommunicationControls,
+      blockedUsers = blockedUsers,
+      mutedUsers = mutedUsers,
+      reports = submittedReports,
+      activeSessions = activeSessions,
+      emergencyShield = emergencyShield,
+      isTwoFactorEnabled = twoFactorEnabled,
+      appeals = userAppeals,
+      onUpdatePrivacySettings = { newSettings -> repository.updatePrivacySettings(newSettings) },
+      onUpdateCommunicationControls = { newControls -> repository.updateCommunicationControls(newControls) },
+      onUnblockUser = { userId -> repository.unblockUser(userId) },
+      onBlockUser = { userId, name, reason -> repository.blockUser(userId, name, reason) },
+      onUnmuteUser = { userId -> repository.unmuteUser(userId) },
+      onMuteUser = { userId, name, duration -> repository.muteUser(userId, name, duration) },
+      onSubmitReport = { cat, targetType, targetId, reason, note, isAnon ->
+        repository.submitUserReport(cat, targetType, targetId, reason, note, isAnon)
+      },
+      onSubmitAppeal = { sanction, explanation -> repository.submitAppeal(sanction, explanation) },
+      onToggleEmergencyShield = { enable -> repository.toggleEmergencyShield(enable) },
+      onTerminateSession = { id -> repository.terminateSession(id) },
+      onTerminateAllOtherSessions = { repository.terminateAllOtherSessions() },
+      onToggleTwoFactor = { repository.toggleTwoFactor() },
+      onExportData = { repository.exportUserDataJson() },
+      onDismiss = { showSafetyDashboard = false }
     )
   }
 }

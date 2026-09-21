@@ -97,6 +97,8 @@ fun MenuDialog(
   onDismiss: () -> Unit,
   onProfileClick: () -> Unit,
   onCreatorConsoleClick: () -> Unit,
+  onAdminDashboardClick: () -> Unit = {},
+  onSafetyDashboardClick: () -> Unit = {},
   onAuthClick: () -> Unit,
   onToggleHideEmail: () -> Unit,
   onToggleHideCode: () -> Unit,
@@ -259,6 +261,31 @@ fun MenuDialog(
           if (profile.canManageContent) {
             item {
               SettingsGroupCard(title = "👑 Privilèges Administrateur CGC") {
+                // Advanced Admin Dashboard (Control Center)
+                Row(
+                  modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                      onDismiss()
+                      onAdminDashboardClick()
+                    }
+                    .padding(vertical = 10.dp),
+                  verticalAlignment = Alignment.CenterVertically,
+                  horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                  Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Icon(Icons.Default.Security, contentDescription = null, tint = CyanNeon, modifier = Modifier.size(20.dp))
+                    Column {
+                      Text("Tableau de Bord Administrateur Avancé", color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                      Text("Monitoring, RBAC, modération, audit logs, 2FA, DRP", color = TextSecondary, fontSize = 11.sp)
+                    }
+                  }
+                  Text("Ouvrir ➔", color = CyanGlow, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                }
+
+                HorizontalDivider(color = CyberCardBorder)
+
+                // Classic Creator Console
                 Row(
                   modifier = Modifier
                     .fillMaxWidth()
@@ -271,14 +298,40 @@ fun MenuDialog(
                   horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                   Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Icon(Icons.Default.Security, contentDescription = null, tint = GoldNeon, modifier = Modifier.size(20.dp))
+                    Icon(Icons.Default.Shield, contentDescription = null, tint = GoldNeon, modifier = Modifier.size(20.dp))
                     Column {
-                      Text("Console Créateur & Gestion", color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                      Text("Gérer rôles, bannir tricheurs, créer tournois", color = TextSecondary, fontSize = 11.sp)
+                      Text("Console Créateur & Gestion Rapide", color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                      Text("Gérer rôles, tournois, salons, annonces", color = TextSecondary, fontSize = 11.sp)
                     }
                   }
                   Text("Ouvrir ➔", color = GoldNeon, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 }
+              }
+            }
+          }
+
+          // 2.5 Section: Liberté, Confort & Sécurité Utilisateur (Espace Global)
+          item {
+            SettingsGroupCard(title = "🛡️ Espace Liberté, Confort & Sécurité") {
+              Row(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .clickable {
+                    onDismiss()
+                    onSafetyDashboardClick()
+                  }
+                  .padding(vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+              ) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                  Icon(Icons.Default.Shield, contentDescription = null, tint = EmeraldNeon, modifier = Modifier.size(22.dp))
+                  Column {
+                    Text("Centre de Liberté & Protection Personnelle", color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text("Confidentialité, contrôle des contacts, blocages, sessions & 2FA", color = TextSecondary, fontSize = 11.sp)
+                  }
+                }
+                Text("Ouvrir ➔", color = EmeraldGlow, fontSize = 11.sp, fontWeight = FontWeight.Bold)
               }
             }
           }
